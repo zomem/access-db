@@ -1,0 +1,13 @@
+dist/
+lib/
+minjs/
+babel/
+node_modules/
+package-lock.json
+yarn.lock
+DOC.md
+OP.md
+
+.DS_Store
+
+.env
