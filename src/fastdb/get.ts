@@ -1,12 +1,12 @@
 import {pathTo} from '../utils/pathTo'
-import {IFastdbGetRes} from '../index'
+import {FastdbGetRes} from '../index'
 import {FASTDB_FILE_ERROR, FASTDB_GET_ID_ERROR} from '../constants/error'
 import {isNumber} from '../utils/utils'
 
 const fs = require('fs')
 
 
-function fetchGet(table: string, id: string | number): IFastdbGetRes {
+function fetchGet(table: string, id: string | number): FastdbGetRes {
   const filePath = pathTo(table)
   let oldBuf, result
   if (!fs.existsSync(filePath)) {

@@ -28,8 +28,8 @@ export const SET_METHORD = [
   'geo'
 ]
 
-export const J_MAX = 10   // j*  参数的最大少于个数
-export const J_NAME_LIST = ['j0', 'j1', 'j2', 'j3', 'j4', 'j5', 'j6', 'j7', 'j8', 'j9']
+export const J_MAX = 6   // j*  参数的最大少于个数
+export const J_NAME_LIST = ['j0', 'j1', 'j2', 'j3', 'j4', 'j5']
 
 
 // redis 

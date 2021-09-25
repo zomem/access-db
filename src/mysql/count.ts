@@ -7,12 +7,12 @@
  * @FilePath: /@minappjs/weapp/src/count.ts
  */ 
 import fetchFind from './find'
-import {TTable, IMysqlCountParams, IMysqlFindRes, TSentence, ICountRes} from '../index'
+import {TTable, MysqlCountParams, MysqlFindRes, TSentence, CountRes} from '../index'
 
 
-function fetchCount(table: TTable, params: IMysqlCountParams): Promise<ICountRes>
-function fetchCount(table: TTable, params: IMysqlCountParams, query: TSentence): Promise<string>
-function fetchCount(table: TTable, params: IMysqlCountParams, query?: TSentence): Promise<ICountRes | string>{
+function fetchCount(table: TTable, params: MysqlCountParams): Promise<CountRes>
+function fetchCount(table: TTable, params: MysqlCountParams, query: TSentence): Promise<string>
+function fetchCount(table: TTable, params: MysqlCountParams = {}, query?: TSentence): Promise<CountRes | string>{
   return new Promise((resolve, reject)=>{
     //mysql类
     params.limit = 1
@@ -31,7 +31,7 @@ function fetchCount(table: TTable, params: IMysqlCountParams, query?: TSentence)
         j0: ['*', 'count'],
         ...params,
         select: ['j0']
-      }).then((res: IMysqlFindRes) => {
+      }).then((res: MysqlFindRes) => {
         let num: number = 0
         if(res.data.objects.length > 0){
           num = parseInt(res.data.objects[0].j0)

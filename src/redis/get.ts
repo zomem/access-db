@@ -1,14 +1,14 @@
 
-import {redisClient, redisGetExpire} from '../utils/dbConnect'
-import {TStructure, IRedisGetRes, IRedisGetQuery} from '../index'
+import {redisClient, redisGetExpire} from '../utils/dbRedis'
+import {TStructure, RedisGetRes, RedisGetQuery} from '../index'
 import getTrans from '../utils/getTrans'
 import {PLATFORM_NAME} from '../constants/constants'
 import {isArray} from '../utils/utils'
 
 
 
-function fetchGet(structure: 'string', params: string | string[], query?: IRedisGetQuery): Promise<IRedisGetRes>
-function fetchGet(structure: TStructure, params: string | string[]='', query: IRedisGetQuery = {}): Promise<IRedisGetRes>{
+function fetchGet(structure: 'string', params: string | string[], query?: RedisGetQuery): Promise<RedisGetRes>
+function fetchGet(structure: TStructure, params: string | string[]='', query: RedisGetQuery = {}): Promise<RedisGetRes>{
   return new Promise((resolve, reject)=>{
     let tempGet: {method: string, key: string[]} = getTrans(params, {structure}, PLATFORM_NAME.REDIS)
     

@@ -1,4 +1,4 @@
-import {IFastdbParams, IFastdbSetRes} from '../index'
+import {FastdbParams, FastdbSetRes} from '../index'
 import {pathTo, mkdir} from '../utils/pathTo'
 import {strHash} from '../utils/timeHash'
 import {FASTDB_HAVE_ID_ERROR} from '../constants/error'
@@ -6,7 +6,7 @@ import {isNumber, changeSetParams} from '../utils/utils'
 
 const fs = require('fs')
 
-function fetchSet(table: string, params: IFastdbParams={}): IFastdbSetRes {
+function fetchSet(table: string, params: FastdbParams={}): FastdbSetRes {
   const filePath = pathTo(table)
   let oldBuf
   if (!fs.existsSync(filePath)) {

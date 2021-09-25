@@ -6,21 +6,27 @@
  * @Description: In User Settings Edit
  * @FilePath: /@minappjs/weapp/src/count.ts
  */ 
-import {mongodbCollection} from '../utils/dbConnect'
-import {TTable, IMongodbCountParams, ICountRes} from '../index'
+import {mongodbCollection} from '../utils/dbMongodb'
+import {TTable, MongodbCountParams, CountRes} from '../index'
 import {PLATFORM_NAME} from '../constants/constants'
 import findTrans from '../utils/findTrans'
 
-function fetchCount(table: TTable, params: IMongodbCountParams): Promise<ICountRes>{
-  return new Promise((resolve, reject)=>{
-    mongodbCollection((db, client) => {
-      let QQ = findTrans<IMongodbCountParams>(params, 1, null, PLATFORM_NAME.MONGODB)
-      db.collection(table).find(QQ).count((err, res) => {
-        if (err) reject(err)
-        client.close()
-        resolve({data: res})
-      })
-    })
+const {client, db} = mongodbCollection
+
+
+function fetchCount(table: TTable, params: MongodbCountParams = {}): Promise<CountRes>{
+  if(!client) return
+  return new Promise(async (resolve, reject)=>{
+    try{
+      let QQ = findTrans<MongodbCountParams>(params, 1, null, PLATFORM_NAME.MONGODB) || {}
+      await client.connect()
+      let res: any = await db.collection(table).find(QQ === 2 ? {} : QQ).count()
+      await client.close()
+      resolve({data: res})
+    }catch(err){
+      await client.close()
+      reject(err)
+    }
   })
 }
 

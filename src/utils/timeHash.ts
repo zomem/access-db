@@ -1,37 +1,21 @@
 
-const word1 = [
+const word = [
   'a', 'b', 'c', 'd', 'e',
   'f', 'g', 'h', 'i', 'j'
 ]
 
-const word2 = [
-  'k', 'l', 'm', 'n', 'o',
-  'p', 'q', 'r', 's', 't'
-]
-
-
 // 以hrTime为随机的hash
 export default function timeHash(){
-
-  let hrTime = process.hrtime()
-  let sec = hrTime[0]
-  let nano = hrTime[1]
+  let [sec, nano] = process.hrtime()
   let hash = ''
-
-  for(let i = 0; i < 5; i++){
-    let n = ((sec % (10 * (10 ** i))) / (10 ** i)) >>> 0
-    hash = hash + word1[n]
+  let str = `${nano}${sec}`
+  for(let i = 0; i < str.length; i++){
+    hash += word[str[i]] || 'x'
   }
-
-  for(let i = 0; i < 9; i++){
-    let n = ((nano % (10 * (10 ** i))) / (10 ** i)) >>> 0
-    hash = hash + word2[n]
-  }
-  
   return hash
 }
 
-
+// fastdb 新增时的随机id
 export const strHash = () => {
   let hrt = process.hrtime()
   let nowTime = new Date().getTime()

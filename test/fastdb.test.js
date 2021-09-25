@@ -138,7 +138,7 @@ test('fastdb update test: ', async () => {
 
 
 test('fastdb find test: ', async () => {
-  // return
+  return
   // console.time('count_time')
   // let count = fastdb.count('test', {
   //   p0: ['age', '=', 32],

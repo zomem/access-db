@@ -1,22 +1,22 @@
-import {mysqlConnect} from '../utils/dbConnect'
+import {mysqlConnect} from '../utils/dbMysql'
 import {J_MAX, J_NAME_LIST, PLATFORM_NAME} from '../constants/constants'
 import {PARAM_TABLE_ERROR, FIND_J_JOIN_ERROR, FIND_NO_PJ_ERROR} from '../constants/error'
-import {TTable, IMysqlCheckParams, IMysqlFindRes, TSentence} from '../index'
+import {TTable, MysqlCheckParams, MysqlFindRes, TSentence} from '../index'
 import findTrans from '../utils/findTrans'
 import timeHash from '../utils/timeHash'
 
 
-const SAME_NAME_TAG = '__as__hash__'
-
-
-function fetchFind(table: TTable, params: IMysqlCheckParams): Promise<IMysqlFindRes>
-function fetchFind(table: TTable, params: IMysqlCheckParams, query: TSentence): Promise<string>
-function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence): Promise<IMysqlFindRes | string>{
+function fetchFind(table: TTable, params: MysqlCheckParams): Promise<MysqlFindRes>
+function fetchFind(table: TTable, params: MysqlCheckParams, query: TSentence): Promise<string>
+function fetchFind(table: TTable, params: MysqlCheckParams = {}, query?: TSentence): Promise<MysqlFindRes | string>{
   if(!table) throw new Error(PARAM_TABLE_ERROR)
   return new Promise((resolve, reject)=>{
     let tableList = table.toString().replace(/\s*/g, '').split(',')
     let tableHash = {}, tableMain = tableList[0]
-    let joinList = []
+    let joinList = [], 
+        joinJnameList = [], // 所有j*名字
+        joinJ = [],   // 所有j
+        joinJObj = {} //对应joinList的j*: name名字
     for(let j = 0; j < J_MAX; j++){
       if(params[`j${j}`]){
         let t1 = params[`j${j}`][0].split('.')
@@ -28,19 +28,24 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
           t2[0] = tableMain
         }
         if(t1[0] === t2[0]){
-          t2[0] = t2[0] + SAME_NAME_TAG
+          t2[0] = `j${j}` + t2[0] // 1，2名字相同，则重命名
         }
-        if(!tableList.includes(t1[0]) && tableMain !== t1[0]){
+        let index = joinList.indexOf(t2[0])
+        if(index > -1){
+          t2[0] = `j${j}` + t2[0] // 2，2名字相同，则重命名
+          joinList[index] = joinJnameList[index]   //同时将之前的怀重新命名
+          joinJObj[joinJ[index]] = joinJnameList[index] //同时将之前的怀重新命名
+        }
+        if(tableList.indexOf(t1[0]) === -1 && tableMain !== t1[0]){
           tableList.push(t1[0])
         }
-        if(params[`j${j}`][1] === 'inner'
-          || params[`j${j}`][1] === 'left'
-          || params[`j${j}`][1] === 'right'
-          || params[`j${j}`][1] === 'full'
-        ){
-          if(t2[0] === SAME_NAME_TAG) throw new Error(FIND_J_JOIN_ERROR)
-          if(!joinList.includes(t2[0]) && tableMain !== t2[0]){
+        if(['inner', 'left', 'right', 'full'].indexOf(params[`j${j}`][1]) > -1){
+          if(t2[0] === `j${j}`) throw new Error(FIND_J_JOIN_ERROR)
+          if(joinList.indexOf(t2[0]) === -1 && tableMain !== t2[0]){
             joinList.push(t2[0])
+            joinJObj[`j${j}`] = t2[0]
+            joinJ.push(`j${j}`)
+            joinJnameList.push(`j${j}` + t2[0])
           }
         }
       }
@@ -50,10 +55,10 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
     let des = []
     for(let i = 0; i < alltable.length; i++){
       if(!tableHash[alltable[i]]){
-        if(tableList.includes(alltable[i])){
+        if(tableList.indexOf(alltable[i]) > -1){
           let tempHash = timeHash()
           tableHash[alltable[i]] = tempHash
-          if(!joinList.includes(alltable[i])){
+          if(joinList.indexOf(alltable[i]) === -1){
             des.push(`${alltable[i]} AS ${tempHash}`)
           }
         }else{
@@ -62,7 +67,9 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
       }
     }
 
-    let joinDes = '', jObj = {}, jTable = {}, jUniqueTable = []
+    let joinDes = '', jObj = {}, jTable = {}, jUniqueTable = [], jNum=0
+
+    
     for(let j = 0; j < J_MAX; j++){
       if(params[`j${j}`]){
         let t1 = params[`j${j}`][0].split('.')
@@ -70,10 +77,9 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
           t1.push(t1[0])
           t1[0] = tableMain
         }
-        let isSameName = false
         let t2 = ['']
         if(params[`j${j}`][2]){
-          if(params[`j${j}`][2].includes('SELECT')){
+          if(params[`j${j}`][2].indexOf('SELECT') > -1){
             t2 = [`(${params[`j${j}`][2]})`]
           }else{
             t2 = params[`j${j}`][2].split('.')
@@ -91,40 +97,28 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
               t2.push(t2[0])
               t2[0] = tableMain
             }
-            if(t1[0] === t2[0]){
-              isSameName = true
-            }
-            joinDes = joinDes + ` INNER JOIN ${t2[0]} AS ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]}.${t2[1]}`
+            joinDes = joinDes + ` INNER JOIN ${t2[0]} AS ${tableHash[joinJObj[`j${j}`]]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[joinJObj[`j${j}`]]}.${t2[1]}`
             break
           case 'left':
             if(t2.length === 1){
               t2.push(t2[0])
               t2[0] = tableMain
             }
-            if(t1[0] === t2[0]){
-              isSameName = true
-            }
-            joinDes = joinDes + ` LEFT JOIN ${t2[0]} AS ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]}.${t2[1]}`
+            joinDes = joinDes + ` LEFT JOIN ${t2[0]} AS ${tableHash[joinJObj[`j${j}`]]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[joinJObj[`j${j}`]]}.${t2[1]}`
             break
           case 'right':
             if(t2.length === 1){
               t2.push(t2[0])
               t2[0] = tableMain
             }
-            if(t1[0] === t2[0]){
-              isSameName = true
-            }
-            joinDes = joinDes + ` RIGHT JOIN ${t2[0]} AS ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]}.${t2[1]}`
+            joinDes = joinDes + ` RIGHT JOIN ${t2[0]} AS ${tableHash[joinJObj[`j${j}`]]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[joinJObj[`j${j}`]]}.${t2[1]}`
             break
           case 'full':
             if(t2.length === 1){
               t2.push(t2[0])
               t2[0] = tableMain
             }
-            if(t1[0] === t2[0]){
-              isSameName = true
-            }
-            joinDes = joinDes + ` FULL JOIN ${t2[0]} AS ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[t2[0] + (isSameName ? SAME_NAME_TAG : '')]}.${t2[1]}`
+            joinDes = joinDes + ` FULL JOIN ${t2[0]} AS ${tableHash[joinJObj[`j${j}`]]} ON ${tableHash[t1[0]]}.${t1[1]} = ${tableHash[joinJObj[`j${j}`]]}.${t2[1]}`
             break
           case 'count':
             if(params[`j${j}`][2] === 'distinct'){
@@ -194,30 +188,24 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
       }
     }
 
-    let QQ = findTrans<IMysqlCheckParams>(params, 1, {tableHash: tableHash, tableMain: tableMain, table}, PLATFORM_NAME.MYSQL)
-    let QQ2 = findTrans<IMysqlCheckParams>(params, 2, {tableHash: tableHash, tableMain: tableMain, jObj, table}, PLATFORM_NAME.MYSQL)
+    let QQ = findTrans<MysqlCheckParams>(params, 1, {tableHash: tableHash, tableMain: tableMain, table}, PLATFORM_NAME.MYSQL)
+    let QQ2 = findTrans<MysqlCheckParams>(params, 2, {tableHash: tableHash, tableMain: tableMain, jObj, table}, PLATFORM_NAME.MYSQL)
     let selectArr = []
     if(params.select){
       for(let n = 0; n < params.select.length; n++){
-        if(params.select[n].includes('SELECT')){
+        if(params.select[n].indexOf('SELECT') > -1){
           selectArr.push(`(${params.select[n]}) AS ${tableMain}_s${n}`)
         }else{
-          let jName = params.select[n].replace(/^\s*/g, '').substring(0,2)
-          if(J_NAME_LIST.includes(jName)){
+          let jName = params.select[n].split(' ')[0]
+          if(J_NAME_LIST.indexOf(jName) > -1){
             if(!params[jName]) throw new Error(FIND_NO_PJ_ERROR + jName)
             let asJname = params.select[n]
-            if(params.select[n].includes(' as ')){
+            if(params.select[n].indexOf(' as ') > -1){
               asJname = params.select[n].split(' as ')[1]
             }
-            if(params.select[n].includes(' AS ')){
+            if(params.select[n].indexOf(' AS ') > -1){
               asJname = params.select[n].split(' AS ')[1]
             }
-            //let tempSe = params[params.select[n]]
-            // let tempSe1 = tempSe[0].split('.')
-            // if(tempSe1.length === 1){
-            //   tempSe1[1] = tempSe1[0]
-            // }
-            //selectArr.push(`${jObj[params.select[n]]} AS ${tempSe1[1] === '*' ? 'all' : tempSe1[1]}_${tempSe[1]}${n}`)
             selectArr.push(`${jObj[jName]} AS ${asJname}`)
           }else{
             let tempS = params.select[n].split('.')
@@ -263,9 +251,9 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
     sql = `SELECT ${selectArr.length > 0 ? selectArr.toString() + ' ' : '* '}`
     + `FROM ${des.toString()} `
     + `${joinDes} `
-    + (QQ ? `WHERE ${QQ} ` : ' ')
+    + (QQ === 2 ? ' ' : `WHERE ${QQ} `)
     + (groupArr.length > 0 ? `GROUP BY ${groupArr.toString()} ` : ' ')
-    + (QQ2 ? `HAVING ${QQ2} ` : ' ')
+    + (QQ2 === 2 ? ' ' : `HAVING ${QQ2} `)
     + (orderArr.length > 0 ? `ORDER BY ${orderArr.toString()} ` : ' ')
     + ((params.limit || params.page) ? `LIMIT ${params.limit || 20} ` : ' ')
     + ((params.page || params.limit) ? `OFFSET ${(params.limit || 20) * ((params.page || 1) - 1)}` : '')
@@ -273,7 +261,7 @@ function fetchFind(table: TTable, params: IMysqlCheckParams, query?: TSentence):
     if(jUniqueTable.length > 0){
       //去掉重复命令的，以父查寻命名为准
       for(let t in tableHash){
-        if(jUniqueTable.includes(t)){
+        if(jUniqueTable.indexOf(t) > -1){
           let tempOneHash = `${t} AS ${tableHash[t]}`
           let oneHash = `${tableHash[t]}`
           let reg = new RegExp(`${t} AS [a-z]{14}`, 'g')

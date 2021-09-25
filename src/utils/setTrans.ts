@@ -1,6 +1,6 @@
 import {PLATFORM_NAME, REDIS_STRUCTURE} from '../constants/constants'
 import { UPDATE_ERROR, REDIS_DATA_TYPE_ERROR } from '../constants/error'
-import { isArray, isNumber, isJson } from './utils'
+import { isArray, isJson, changeSqlParam } from './utils'
 
 
 export default function setTrans<T>(params: T, query, dbType){
@@ -14,7 +14,7 @@ export default function setTrans<T>(params: T, query, dbType){
         fieldsArr.push(pa)
         valuesQue.push('?')
         //valuesArr.push(isJson(params[pa]) ? JSON.stringify(params[pa]) : params[pa])
-        valuesArr.push(isNumber(params[pa]) ? params[pa] : `'${params[pa]}'`)
+        valuesArr.push(changeSqlParam(params[pa]))
         //continue
       }else{
         throw new Error(UPDATE_ERROR)

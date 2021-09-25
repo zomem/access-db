@@ -7,7 +7,7 @@ import {
   REDIS_STRUCTURE
 } from '../constants/constants'
 import {UPDATE_ERROR, REDIS_DATA_TYPE_ERROR, REDIS_TYPE_NOMETHOD_ERROR, FASTDB_UPDATE_JSON_ERROR} from '../constants/error'
-import {cloneDeep, isArray, isNumber, isJson} from './utils'
+import {cloneDeep, isArray, isJson, changeSqlParam} from './utils'
 
 
 export default function updateTrans<T>(params: T, query, dbType){
@@ -24,7 +24,7 @@ export default function updateTrans<T>(params: T, query, dbType){
         operate = {...operate, "$set": { ...operate['$set'], ...temp}}
         continue
       }
-      if(MONGODB_UPDATE_METHORD.includes(params[pa][0])){
+      if(MONGODB_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
         switch(params[pa][0]){
           case 'set':
             temp[pa] = params[pa][1]
@@ -69,7 +69,7 @@ export default function updateTrans<T>(params: T, query, dbType){
             break
           case 'remove':
             temp[pa] = {
-              "$each": isArray(params[pa][1]) ? params[pa][1] : [params[pa][1]]
+              "$in": isArray(params[pa][1]) ? params[pa][1] : [params[pa][1]]
             }
             operate = {...operate, "$pull": { ...operate['$pull'], ...temp}}
             break
@@ -91,13 +91,13 @@ export default function updateTrans<T>(params: T, query, dbType){
     for(let pa in params){
       if(!isArray(params[pa])){
         //不是数组，则直接 set
-        operate.push(`${pa} = ${isNumber(params[pa]) ? params[pa] : `'${params[pa]}'`}`)
+        operate.push(`${pa} = ${changeSqlParam(params[pa])}`)
         continue
       }
-      if(MYSQL_UPDATE_METHORD.includes(params[pa][0])){
+      if(MYSQL_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
         switch(params[pa][0]){
           case 'set':
-            operate.push(`${pa} = ${isNumber(params[pa][1]) ? params[pa][1] : `'${params[pa][1]}'`}`)
+            operate.push(`${pa} = ${changeSqlParam(params[pa][1])}`)
             break
           case 'unset':
             operate.push(`${pa} = NULL`)
@@ -114,7 +114,7 @@ export default function updateTrans<T>(params: T, query, dbType){
         }
       }else{
         //直接 set
-        operate.push(`${pa} = ${isNumber(params[pa]) ? params[pa] : `'${params[pa]}'`}`)
+        operate.push(`${pa} = ${changeSqlParam(params[pa])}`)
       }
     }
     result = operate
@@ -145,7 +145,7 @@ export default function updateTrans<T>(params: T, query, dbType){
         continue
       }
 
-      if(REDIS_UPDATE_METHORD.includes(params[pa][0])){
+      if(REDIS_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
         tempValue = params[pa][1]
         switch(query.structure){
           case REDIS_STRUCTURE.string:
@@ -243,7 +243,7 @@ export default function updateTrans<T>(params: T, query, dbType){
         return methodValue
       }
       
-      if(FASTDB_UPDATE_METHORD.includes(methodValue[0])){
+      if(FASTDB_UPDATE_METHORD.indexOf(methodValue[0]) > -1){
         switch(methodValue[0]){
           case 'set':
             return methodValue[1]
@@ -276,12 +276,12 @@ export default function updateTrans<T>(params: T, query, dbType){
           case 'uAppend':
             if(isArray(methodValue[1])){
               for(let c = 0; c < methodValue[1].length; c++){
-                if(!oldValue.includes(methodValue[1][c])){
+                if(oldValue.indexOf(methodValue[1][c]) === -1){
                   oldValue.push(methodValue[1][c])
                 }
               }
             }else{
-              if(!oldValue.includes(methodValue[1])){
+              if(oldValue.indexOf(methodValue[1]) === -1){
                 oldValue.push(methodValue[1])
               }
             }
@@ -290,13 +290,13 @@ export default function updateTrans<T>(params: T, query, dbType){
             let tempv:any = []
             if(isArray(methodValue[1])){
               for(let a = 0; a < oldValue.length; a++){
-                if(!methodValue[1].includes(oldValue[a])){
+                if(methodValue[1].indexOf(oldValue[a]) === -1){
                   tempv.push(oldValue[a])
                 }
               }
             }else{
               for(let a = 0; a < oldValue.length; a++){
-                if(![methodValue[1]].includes(oldValue[a])){
+                if([methodValue[1]].indexOf(oldValue[a]) === -1){
                   tempv.push(oldValue[a])
                 }
               }

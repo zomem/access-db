@@ -7,20 +7,20 @@
  * @FilePath: /@ownpack/weapp/src/fetch/data/get.ts
  */ 
 
-import {mysqlConnect} from '../utils/dbConnect'
-import {isArray, isNumber, isJson} from '../utils/utils'
-import {IMysqlGetRes, TTable, IMysqlGetKey, IMysqlGetQuery, TSentence} from '../index'
+import {mysqlConnect} from '../utils/dbMysql'
+import {isArray, changeSqlParam, isJson} from '../utils/utils'
+import {MysqlGetRes, TTable, MysqlGetKey, MysqlGetQuery, TSentence} from '../index'
 
-function fetchGet(table: TTable, uniKey: string | number | IMysqlGetKey, query?: IMysqlGetQuery): Promise<IMysqlGetRes>
-function fetchGet(table: TTable, uniKey: string | number | IMysqlGetKey, query: TSentence): Promise<string>
-function fetchGet(table: TTable, uniKey: string | number | IMysqlGetKey, query?: IMysqlGetQuery | TSentence): Promise<IMysqlGetRes | string>{
+function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery): Promise<MysqlGetRes>
+function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query: TSentence): Promise<string>
+function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery | TSentence): Promise<MysqlGetRes | string>{
   let tempQuery = (query === 'sentence' || !query) ? {} : query
 
   return new Promise((resolve, reject)=>{
     let selectArr = []
     let tempID='id', tempData
     if(isJson(uniKey)){
-      for(let p in uniKey as IMysqlGetKey){
+      for(let p in uniKey as MysqlGetKey){
         tempID=p
         tempData=uniKey[p]
         break
@@ -43,7 +43,7 @@ function fetchGet(table: TTable, uniKey: string | number | IMysqlGetKey, query?:
     let sql = ''
     sql = `SELECT ${selectArr.length > 0 ? selectArr.toString() + ' ' : '* '}`
     + `FROM ${table} `
-    + `WHERE ${tempID} = ${isNumber(tempData) ? tempData : `'${tempData}'`}`
+    + `WHERE ${tempID} = ${changeSqlParam(tempData)}`
     if(query === 'sentence'){
       resolve(sql)
       return

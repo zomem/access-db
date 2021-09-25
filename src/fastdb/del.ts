@@ -1,12 +1,12 @@
 import {pathTo} from '../utils/pathTo'
-import {IFastdbDeleteRes} from '../index'
+import {FastdbDeleteRes} from '../index'
 import {FASTDB_FILE_ERROR, FASTDB_GET_ID_ERROR} from '../constants/error'
 import {isNumber} from '../utils/utils'
 
 const fs = require('fs')
 
 
-function fetchDel(table: string, id: string | number): IFastdbDeleteRes {
+function fetchDel(table: string, id: string | number): FastdbDeleteRes {
   const filePath = pathTo(table)
   let oldBuf, result, start=-1, end=-1
   if (!fs.existsSync(filePath)) {

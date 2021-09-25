@@ -6,17 +6,17 @@
  * @Description: In User Settings Edit
  * @FilePath: /@ownpack/weapp/src/fetch/data/setOneMany.ts
  */ 
-import {mysqlConnect} from '../utils/dbConnect'
+import {mysqlConnect} from '../utils/dbMysql'
 import {isArray} from '../utils/utils'
-import {TTable, IMysqlSetParams, TSentence} from '../index'
+import {TTable, MysqlSetParams, TSentence} from '../index'
 import {SET_MANY_PARAMS_ARR_ERROR} from '../constants/error'
 import setTrans from '../utils/setTrans'
 import { PLATFORM_NAME } from '../constants/constants'
 
 
-function fetchSetmany(table: TTable, params: IMysqlSetParams[]): Promise<any>
-function fetchSetmany(table: TTable, params: IMysqlSetParams[], query: TSentence): Promise<string>
-function fetchSetmany(table: TTable, params: IMysqlSetParams[], query?: TSentence): Promise<any | string>{
+function fetchSetmany(table: TTable, params: MysqlSetParams[]): Promise<any>
+function fetchSetmany(table: TTable, params: MysqlSetParams[], query: TSentence): Promise<string>
+function fetchSetmany(table: TTable, params: MysqlSetParams[], query?: TSentence): Promise<any | string>{
   if(!isArray(params)) throw new Error(SET_MANY_PARAMS_ARR_ERROR)
 
   return new Promise((resolve, reject)=>{

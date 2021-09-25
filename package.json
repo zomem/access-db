@@ -1,6 +1,6 @@
 {
   "name": "access-db",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Unified access to all kinds of databases",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -11,25 +11,25 @@
   "files": [
     "/lib"
   ],
-  "author": "fairy_zhao",
+  "author": "zomem",
   "license": "MIT",
   "dependencies": {
-    "mongodb": "^3.6.6",
+    "mongodb": "^4.1.1",
     "mysql": "^2.18.1",
     "redis": "^3.1.2"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
-    "@types/mongodb": "^3.6.16",
-    "@types/mysql": "^2.15.18",
-    "@types/node": "^14.0.27",
-    "@types/redis": "^2.8.28",
+    "@types/jest": "^26.0.24",
+    "@types/mongodb": "^4.0.7",
+    "@types/mysql": "^2.15.19",
+    "@types/node": "^14.17.12",
+    "@types/redis": "^2.8.31",
     "del": "^5.1.0",
-    "dotenv": "^9.0.2",
+    "dotenv": "^10.0.0",
     "gulp": "^4.0.2",
     "gulp-uglify": "^3.0.2",
-    "jest": "^26.6.3",
-    "typescript": "^3.9.7"
+    "jest": "^27.0.6",
+    "typescript": "^4.4.2"
   },
   "keywords": [
     "access-db",

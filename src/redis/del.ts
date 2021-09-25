@@ -1,8 +1,8 @@
 
-import {redisClient} from '../utils/dbConnect'
-import {IRedisDeleteRes} from '../index'
+import {redisClient} from '../utils/dbRedis'
+import {RedisDeleteRes} from '../index'
 
-function fetchDel(keys: string | string[]): Promise<IRedisDeleteRes>{
+function fetchDel(keys: string | string[]): Promise<RedisDeleteRes>{
   return new Promise((resolve, reject)=>{
     redisClient.del(keys, async (err, reply) => {
       if (err) {

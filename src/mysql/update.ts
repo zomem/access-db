@@ -1,18 +1,18 @@
 
-import {mysqlConnect} from '../utils/dbConnect'
-import {isNumber, isJson} from '../utils/utils'
-import {IMysqlUpdateParams, TTable, IMysqlUpdateRes, TSentence, IMysqlUpdateKey} from '../index'
+import {mysqlConnect} from '../utils/dbMysql'
+import {isJson, changeSqlParam} from '../utils/utils'
+import {MysqlUpdateParams, TTable, MysqlUpdateRes, TSentence, MysqlUpdateKey} from '../index'
 import updateTrans from '../utils/updateTrans'
 import {PLATFORM_NAME} from '../constants/constants'
 
 
-function fetchUpdate(table: TTable, uniKey: string | number | IMysqlUpdateKey, params: IMysqlUpdateParams): Promise<IMysqlUpdateRes>
-function fetchUpdate(table: TTable, uniKey: string | number | IMysqlUpdateKey, params: IMysqlUpdateParams, query: TSentence): Promise<string>
-function fetchUpdate(table: TTable, uniKey: string | number | IMysqlUpdateKey, params: IMysqlUpdateParams = {}, query?: TSentence): Promise<IMysqlUpdateRes | string>{
+function fetchUpdate(table: TTable, uniKey: string | number | MysqlUpdateKey, params: MysqlUpdateParams): Promise<MysqlUpdateRes>
+function fetchUpdate(table: TTable, uniKey: string | number | MysqlUpdateKey, params: MysqlUpdateParams, query: TSentence): Promise<string>
+function fetchUpdate(table: TTable, uniKey: string | number | MysqlUpdateKey, params: MysqlUpdateParams = {}, query?: TSentence): Promise<MysqlUpdateRes | string>{
   return new Promise((resolve, reject)=>{
     let tempID='id', tempData
     if(isJson(uniKey)){
-      for(let p in uniKey as IMysqlUpdateKey){
+      for(let p in uniKey as MysqlUpdateKey){
         tempID=p
         tempData=uniKey[p]
         break
@@ -20,8 +20,8 @@ function fetchUpdate(table: TTable, uniKey: string | number | IMysqlUpdateKey, p
     }else{
       tempData = uniKey
     }
-    let updata: any = updateTrans<IMysqlUpdateParams>(params, [], PLATFORM_NAME.MYSQL)
-    let sql = `UPDATE ${table} SET ${updata.toString()} WHERE ${tempID} = ${isNumber(tempData) ? tempData : `'${tempData}'`}`
+    let updata: any = updateTrans<MysqlUpdateParams>(params, [], PLATFORM_NAME.MYSQL)
+    let sql = `UPDATE ${table} SET ${updata.toString()} WHERE ${tempID} = ${changeSqlParam(tempData)}`
     if(query === 'sentence'){
       resolve(sql)
       return

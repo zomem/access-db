@@ -1,5 +1,5 @@
 import {pathTo} from '../utils/pathTo'
-import {IFastdbCountParams, ICountRes} from '../index'
+import {FastdbCountParams, CountRes} from '../index'
 import { PLATFORM_NAME } from '../constants/constants'
 import {FASTDB_FILE_ERROR} from '../constants/error'
 import findTrans from '../utils/findTrans'
@@ -7,7 +7,7 @@ import findTrans from '../utils/findTrans'
 const fs = require('fs')
 const POSITION_STEP = 9
 
-function fetchCount(table: string, params: IFastdbCountParams): ICountRes {
+function fetchCount(table: string, params: FastdbCountParams = {}): CountRes {
   const filePath = pathTo(table)
   let oldBuf, num: number = 0
   if (!fs.existsSync(filePath)) {

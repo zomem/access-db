@@ -1,10 +1,18 @@
 
+
 import mongodb_temp from './mongodb/index'
 import mysql_temp from './mysql/index'
 import redis_temp from './redis/index'
 import fastdb_temp from './fastdb'
 import promiseLimit_temp from './common/promiseLimit'
 
+
+
+export const mongodb = mongodb_temp
+export const mysql = mysql_temp
+export const redis = redis_temp
+export const fastdb = fastdb_temp
+export const promiseLimit = promiseLimit_temp
 
 export default {
   mongodb: mongodb_temp,
@@ -15,11 +23,6 @@ export default {
 }
 
 
-export const mongodb = mongodb_temp
-export const mysql = mysql_temp
-export const redis = redis_temp
-export const fastdb = fastdb_temp
-export const promiseLimit = promiseLimit_temp
 
 
 
@@ -29,17 +32,6 @@ export const promiseLimit = promiseLimit_temp
 
 
 
-
-
-
-
-
-
-
-
-
-
-export type TPlatform = 'mongodb' | 'mysql'
 
 
 //查寻的表名或表id
@@ -51,10 +43,16 @@ export type TTable = string
 export type TMongodbCheckMethod = '=' | '!=' | '<' | '<=' | '>' | '>=' |
 'in' | 'notIn' | 'arrContain' | 'regex' | 'strLength' | 'isExists' | 
 'geoInclude' | 'geoWithinCircle' | 'geoWithinRegion' | 'geoWithin'
+
+type TMongodbBSONTypes = 'double' | 'string' | 'object' | 'array' | 'binData' | 
+'objectId' | 'bool' | 'date' | 'null' | 'regex' | 'javascript' | 'int' | 
+'timestamp' | 'long' | 'decimal' | 'minKey' | 'maxKey'
+
 export type TMysqlCheckMethod = '=' | '!=' | '<' | '<=' | '>' | '>=' |
 'in' | 'notIn' | 'regex' | 'strLength' | 
 'like' | 'between' | 'notBetween' |
 'isNull' | 'isExists'
+
 export type TFastdbCheckMethod = '=' | '!=' | '<' | '<=' | '>' | '>=' |
 'in' | 'notIn' | 'arrContain' | 'regex' | 'strLength' | 'isExists'
 
@@ -65,7 +63,7 @@ export type TMysqlJiaMethod = 'uniqueTable' | 'tableOf' | 'inner' | 'left' | 'ri
 
 export type TMysqlJiaParams = 'distinct' | 'all'
 //j参数
-export type TJ = 'j0' | 'j1' | 'j2' | 'j3' | 'j4' | 'j5' | 'j6' | 'j7' | 'j8' | 'j9'
+export type TJ = 'j0' | 'j1' | 'j2' | 'j3' | 'j4' | 'j5'
 
 //查寻的参数
 export type TP = 'p0' | 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'p6' | 'p7' | 'p8'
@@ -73,17 +71,13 @@ export type TP = 'p0' | 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'p6' | 'p7' | 'p8'
 
 
 
-interface IMysqlPRList {
+interface MysqlPRList {
   j0?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
   j1?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
   j2?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
   j3?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
   j4?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
   j5?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
-  j6?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
-  j7?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
-  j8?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
-  j9?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
   p0?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
   p1?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
   p2?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
@@ -104,95 +98,15 @@ interface IMysqlPRList {
   p17?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
   p18?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
   p19?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p20?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p21?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p22?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p23?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p24?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p25?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p26?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p27?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p28?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p29?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p30?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p31?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p32?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p33?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p34?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p35?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p36?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p37?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p38?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p39?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p40?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p41?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p42?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p43?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p44?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p45?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p46?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p47?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p48?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p49?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p50?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p51?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p52?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p53?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p54?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p55?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p56?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p57?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p58?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p59?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p60?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p61?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p62?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p63?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p64?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p65?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p66?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p67?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p68?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p69?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p70?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p71?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p72?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p73?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p74?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p75?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p76?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p77?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p78?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p79?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p80?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p81?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p82?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p83?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p84?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p85?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p86?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p87?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p88?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p89?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p90?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p91?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p92?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p93?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p94?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p95?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p96?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p97?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p98?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
-  p99?: [string, TMysqlCheckMethod, ...any[]] | [TJ, TMysqlCheckMethod, ...any[]]
   r?: string
   r2?: string
 }
 
 
-interface IMongodbPRList {
-  p0?: [string, TMongodbCheckMethod, ...any[]]
-  p1?: [string, TMongodbCheckMethod, ...any[]]
-  p2?: [string, TMongodbCheckMethod, ...any[]]
+interface MongodbPRList {
+  p0?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes | TMongodbBSONTypes[]]
+  p1?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p2?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
   p3?: [string, TMongodbCheckMethod, ...any[]]
   p4?: [string, TMongodbCheckMethod, ...any[]]
   p5?: [string, TMongodbCheckMethod, ...any[]]
@@ -210,91 +124,11 @@ interface IMongodbPRList {
   p17?: [string, TMongodbCheckMethod, ...any[]]
   p18?: [string, TMongodbCheckMethod, ...any[]]
   p19?: [string, TMongodbCheckMethod, ...any[]]
-  p20?: [string, TMongodbCheckMethod, ...any[]]
-  p21?: [string, TMongodbCheckMethod, ...any[]]
-  p22?: [string, TMongodbCheckMethod, ...any[]]
-  p23?: [string, TMongodbCheckMethod, ...any[]]
-  p24?: [string, TMongodbCheckMethod, ...any[]]
-  p25?: [string, TMongodbCheckMethod, ...any[]]
-  p26?: [string, TMongodbCheckMethod, ...any[]]
-  p27?: [string, TMongodbCheckMethod, ...any[]]
-  p28?: [string, TMongodbCheckMethod, ...any[]]
-  p29?: [string, TMongodbCheckMethod, ...any[]]
-  p30?: [string, TMongodbCheckMethod, ...any[]]
-  p31?: [string, TMongodbCheckMethod, ...any[]]
-  p32?: [string, TMongodbCheckMethod, ...any[]]
-  p33?: [string, TMongodbCheckMethod, ...any[]]
-  p34?: [string, TMongodbCheckMethod, ...any[]]
-  p35?: [string, TMongodbCheckMethod, ...any[]]
-  p36?: [string, TMongodbCheckMethod, ...any[]]
-  p37?: [string, TMongodbCheckMethod, ...any[]]
-  p38?: [string, TMongodbCheckMethod, ...any[]]
-  p39?: [string, TMongodbCheckMethod, ...any[]]
-  p40?: [string, TMongodbCheckMethod, ...any[]]
-  p41?: [string, TMongodbCheckMethod, ...any[]]
-  p42?: [string, TMongodbCheckMethod, ...any[]]
-  p43?: [string, TMongodbCheckMethod, ...any[]]
-  p44?: [string, TMongodbCheckMethod, ...any[]]
-  p45?: [string, TMongodbCheckMethod, ...any[]]
-  p46?: [string, TMongodbCheckMethod, ...any[]]
-  p47?: [string, TMongodbCheckMethod, ...any[]]
-  p48?: [string, TMongodbCheckMethod, ...any[]]
-  p49?: [string, TMongodbCheckMethod, ...any[]]
-  p50?: [string, TMongodbCheckMethod, ...any[]]
-  p51?: [string, TMongodbCheckMethod, ...any[]]
-  p52?: [string, TMongodbCheckMethod, ...any[]]
-  p53?: [string, TMongodbCheckMethod, ...any[]]
-  p54?: [string, TMongodbCheckMethod, ...any[]]
-  p55?: [string, TMongodbCheckMethod, ...any[]]
-  p56?: [string, TMongodbCheckMethod, ...any[]]
-  p57?: [string, TMongodbCheckMethod, ...any[]]
-  p58?: [string, TMongodbCheckMethod, ...any[]]
-  p59?: [string, TMongodbCheckMethod, ...any[]]
-  p60?: [string, TMongodbCheckMethod, ...any[]]
-  p61?: [string, TMongodbCheckMethod, ...any[]]
-  p62?: [string, TMongodbCheckMethod, ...any[]]
-  p63?: [string, TMongodbCheckMethod, ...any[]]
-  p64?: [string, TMongodbCheckMethod, ...any[]]
-  p65?: [string, TMongodbCheckMethod, ...any[]]
-  p66?: [string, TMongodbCheckMethod, ...any[]]
-  p67?: [string, TMongodbCheckMethod, ...any[]]
-  p68?: [string, TMongodbCheckMethod, ...any[]]
-  p69?: [string, TMongodbCheckMethod, ...any[]]
-  p70?: [string, TMongodbCheckMethod, ...any[]]
-  p71?: [string, TMongodbCheckMethod, ...any[]]
-  p72?: [string, TMongodbCheckMethod, ...any[]]
-  p73?: [string, TMongodbCheckMethod, ...any[]]
-  p74?: [string, TMongodbCheckMethod, ...any[]]
-  p75?: [string, TMongodbCheckMethod, ...any[]]
-  p76?: [string, TMongodbCheckMethod, ...any[]]
-  p77?: [string, TMongodbCheckMethod, ...any[]]
-  p78?: [string, TMongodbCheckMethod, ...any[]]
-  p79?: [string, TMongodbCheckMethod, ...any[]]
-  p80?: [string, TMongodbCheckMethod, ...any[]]
-  p81?: [string, TMongodbCheckMethod, ...any[]]
-  p82?: [string, TMongodbCheckMethod, ...any[]]
-  p83?: [string, TMongodbCheckMethod, ...any[]]
-  p84?: [string, TMongodbCheckMethod, ...any[]]
-  p85?: [string, TMongodbCheckMethod, ...any[]]
-  p86?: [string, TMongodbCheckMethod, ...any[]]
-  p87?: [string, TMongodbCheckMethod, ...any[]]
-  p88?: [string, TMongodbCheckMethod, ...any[]]
-  p89?: [string, TMongodbCheckMethod, ...any[]]
-  p90?: [string, TMongodbCheckMethod, ...any[]]
-  p91?: [string, TMongodbCheckMethod, ...any[]]
-  p92?: [string, TMongodbCheckMethod, ...any[]]
-  p93?: [string, TMongodbCheckMethod, ...any[]]
-  p94?: [string, TMongodbCheckMethod, ...any[]]
-  p95?: [string, TMongodbCheckMethod, ...any[]]
-  p96?: [string, TMongodbCheckMethod, ...any[]]
-  p97?: [string, TMongodbCheckMethod, ...any[]]
-  p98?: [string, TMongodbCheckMethod, ...any[]]
-  p99?: [string, TMongodbCheckMethod, ...any[]]
   r?: string
   r2?: string
 }
 
-interface IFastdbPRList {
+interface FastdbPRList {
   p0?: [string, TFastdbCheckMethod, ...any[]]
   p1?: [string, TFastdbCheckMethod, ...any[]]
   p2?: [string, TFastdbCheckMethod, ...any[]]
@@ -315,119 +149,39 @@ interface IFastdbPRList {
   p17?: [string, TFastdbCheckMethod, ...any[]]
   p18?: [string, TFastdbCheckMethod, ...any[]]
   p19?: [string, TFastdbCheckMethod, ...any[]]
-  p20?: [string, TFastdbCheckMethod, ...any[]]
-  p21?: [string, TFastdbCheckMethod, ...any[]]
-  p22?: [string, TFastdbCheckMethod, ...any[]]
-  p23?: [string, TFastdbCheckMethod, ...any[]]
-  p24?: [string, TFastdbCheckMethod, ...any[]]
-  p25?: [string, TFastdbCheckMethod, ...any[]]
-  p26?: [string, TFastdbCheckMethod, ...any[]]
-  p27?: [string, TFastdbCheckMethod, ...any[]]
-  p28?: [string, TFastdbCheckMethod, ...any[]]
-  p29?: [string, TFastdbCheckMethod, ...any[]]
-  p30?: [string, TFastdbCheckMethod, ...any[]]
-  p31?: [string, TFastdbCheckMethod, ...any[]]
-  p32?: [string, TFastdbCheckMethod, ...any[]]
-  p33?: [string, TFastdbCheckMethod, ...any[]]
-  p34?: [string, TFastdbCheckMethod, ...any[]]
-  p35?: [string, TFastdbCheckMethod, ...any[]]
-  p36?: [string, TFastdbCheckMethod, ...any[]]
-  p37?: [string, TFastdbCheckMethod, ...any[]]
-  p38?: [string, TFastdbCheckMethod, ...any[]]
-  p39?: [string, TFastdbCheckMethod, ...any[]]
-  p40?: [string, TFastdbCheckMethod, ...any[]]
-  p41?: [string, TFastdbCheckMethod, ...any[]]
-  p42?: [string, TFastdbCheckMethod, ...any[]]
-  p43?: [string, TFastdbCheckMethod, ...any[]]
-  p44?: [string, TFastdbCheckMethod, ...any[]]
-  p45?: [string, TFastdbCheckMethod, ...any[]]
-  p46?: [string, TFastdbCheckMethod, ...any[]]
-  p47?: [string, TFastdbCheckMethod, ...any[]]
-  p48?: [string, TFastdbCheckMethod, ...any[]]
-  p49?: [string, TFastdbCheckMethod, ...any[]]
-  p50?: [string, TFastdbCheckMethod, ...any[]]
-  p51?: [string, TFastdbCheckMethod, ...any[]]
-  p52?: [string, TFastdbCheckMethod, ...any[]]
-  p53?: [string, TFastdbCheckMethod, ...any[]]
-  p54?: [string, TFastdbCheckMethod, ...any[]]
-  p55?: [string, TFastdbCheckMethod, ...any[]]
-  p56?: [string, TFastdbCheckMethod, ...any[]]
-  p57?: [string, TFastdbCheckMethod, ...any[]]
-  p58?: [string, TFastdbCheckMethod, ...any[]]
-  p59?: [string, TFastdbCheckMethod, ...any[]]
-  p60?: [string, TFastdbCheckMethod, ...any[]]
-  p61?: [string, TFastdbCheckMethod, ...any[]]
-  p62?: [string, TFastdbCheckMethod, ...any[]]
-  p63?: [string, TFastdbCheckMethod, ...any[]]
-  p64?: [string, TFastdbCheckMethod, ...any[]]
-  p65?: [string, TFastdbCheckMethod, ...any[]]
-  p66?: [string, TFastdbCheckMethod, ...any[]]
-  p67?: [string, TFastdbCheckMethod, ...any[]]
-  p68?: [string, TFastdbCheckMethod, ...any[]]
-  p69?: [string, TFastdbCheckMethod, ...any[]]
-  p70?: [string, TFastdbCheckMethod, ...any[]]
-  p71?: [string, TFastdbCheckMethod, ...any[]]
-  p72?: [string, TFastdbCheckMethod, ...any[]]
-  p73?: [string, TFastdbCheckMethod, ...any[]]
-  p74?: [string, TFastdbCheckMethod, ...any[]]
-  p75?: [string, TFastdbCheckMethod, ...any[]]
-  p76?: [string, TFastdbCheckMethod, ...any[]]
-  p77?: [string, TFastdbCheckMethod, ...any[]]
-  p78?: [string, TFastdbCheckMethod, ...any[]]
-  p79?: [string, TFastdbCheckMethod, ...any[]]
-  p80?: [string, TFastdbCheckMethod, ...any[]]
-  p81?: [string, TFastdbCheckMethod, ...any[]]
-  p82?: [string, TFastdbCheckMethod, ...any[]]
-  p83?: [string, TFastdbCheckMethod, ...any[]]
-  p84?: [string, TFastdbCheckMethod, ...any[]]
-  p85?: [string, TFastdbCheckMethod, ...any[]]
-  p86?: [string, TFastdbCheckMethod, ...any[]]
-  p87?: [string, TFastdbCheckMethod, ...any[]]
-  p88?: [string, TFastdbCheckMethod, ...any[]]
-  p89?: [string, TFastdbCheckMethod, ...any[]]
-  p90?: [string, TFastdbCheckMethod, ...any[]]
-  p91?: [string, TFastdbCheckMethod, ...any[]]
-  p92?: [string, TFastdbCheckMethod, ...any[]]
-  p93?: [string, TFastdbCheckMethod, ...any[]]
-  p94?: [string, TFastdbCheckMethod, ...any[]]
-  p95?: [string, TFastdbCheckMethod, ...any[]]
-  p96?: [string, TFastdbCheckMethod, ...any[]]
-  p97?: [string, TFastdbCheckMethod, ...any[]]
-  p98?: [string, TFastdbCheckMethod, ...any[]]
-  p99?: [string, TFastdbCheckMethod, ...any[]]
   r?: string
 }
 
-export interface IMongodbCheckParams extends IMongodbPRList {
+export interface MongodbCheckParams extends MongodbPRList {
   page?: number
   limit?: number
   orderBy?: string[]
   select?: string[]
   groupBy?: string[]
 }
-export interface IMysqlCheckParams extends IMysqlPRList {
+export interface MysqlCheckParams extends MysqlPRList {
   page?: number
   limit?: number
   orderBy?: string[]
   select?: string[] | TJ[]
   groupBy?: string[]
 }
-export interface IFastdbCheckParams extends IFastdbPRList {
+export interface FastdbCheckParams extends FastdbPRList {
   page?: number
   limit?: number
 }
 
 
-export interface IMysqlCountParams extends IMysqlPRList {
+export interface MysqlCountParams extends MysqlPRList {
   limit?: 1
 }
-export interface IMongodbCountParams extends IMongodbPRList {
+export interface MongodbCountParams extends MongodbPRList {
   limit?: 1
 }
-export interface IFastdbCountParams extends IFastdbPRList {
+export interface FastdbCountParams extends FastdbPRList {
   limit?: 1
 }
-export interface ICountRes {
+export interface CountRes {
   data: number
 }
 
@@ -443,86 +197,96 @@ type dataType = string | string[] | number | number[] | boolean | boolean[] | nu
 
 export type TSentence = 'sentence'
 
-export interface IMongodbUpdateParams {
+export interface MongodbUpdateParams {
   [key: string]: [TMongodbUpdateMethod, dataType] | dataType
 }
-export interface IMysqlUpdateParams {
+export interface MysqlUpdateParams {
   [key: string]: [TMysqlUpdateMethod, dataType] | dataType
 }
-export interface IMysqlUpdateKey{
+export interface MysqlUpdatemanyParams{
+  [key: number]: {
+    [keyi: string]: any
+  }
+}
+export interface MysqlUpdateKey{
+  id?: string | number
   [key: string]: string | number
 }
-export interface IRedisUpdateParams {
+export interface MongodbUpdateKey{
+  _id?: any
+  [key: string]: string | number
+}
+export interface RedisUpdateParams {
   [key: string]: [TRedisUpdateMethod, dataType] | dataType
 }
-export interface IRedisStringUpdateParams {
+export interface RedisStringUpdateParams {
   [key: string]: ['incr' | 'add' | 'set' | 'range' | 'expireSec' | 'expireMillisec' | 'expireAt' | 'expireMilliAt', dataType] | dataType
 }
-export interface IFastdbUpdateParams {
+export interface FastdbUpdateParams {
   [key: string]: [TFastdbUpdateMethod, dataType] | dataType
 }
 
 
 type TMongodbSetMethod = 'geo'
-export interface IMongodbSetParams {
+export interface MongodbSetParams {
   [key: string]: [TMongodbSetMethod, dataType] | dataType
 }
-export interface IMysqlSetParams {
+export interface MysqlSetParams {
   [key: string]: dataType
 }
-export interface IRedisSetQuery {
+export interface RedisSetQuery {
   expireSec?: number
   expireMillisec?: number
   expireAt?: number
   expireMilliAt?: number
 }
-export interface IFastdbParams {
+export interface FastdbParams {
   [key: string]: ['geo', dataType] | dataType
 }
 
 
 
-export interface IMysqlGetKey{
+export interface MysqlGetKey{
   [key: string]: string | number
 }
-export interface IMongodbGetQuery {
+export interface MongodbGetQuery {
   select?: string | string[]
 }
-export interface IMysqlGetQuery {
+export interface MysqlGetQuery {
   select?: string | string[]
 }
-export interface IRedisGetQuery {
+export interface RedisGetQuery {
   expireSec?: boolean
   expireMillisec?: boolean
 }
 
 
 
-export interface IMysqlDeleteParams extends IMysqlPRList {
+export interface MysqlDeleteParams extends MysqlPRList {
   page?: number
   limit?: number
 }
-export interface IMongodbDeleteParams extends IMongodbPRList {
+export interface MongodbDeleteParams extends MongodbPRList {
   page?: number
   limit?: number
 }
 
 //find方法的返回
-export interface IMongodbFindRes {
+export interface MongodbFindRes {
   data: {
     objects: any[]
     [key: string]: any
   }
   [key: string]: any
 }
-export interface IMysqlFindRes {
+export interface MysqlFindRes {
   data: {
     objects: any[]
     [key: string]: any
   }
   [key: string]: any
 }
-export interface IFastdbFindRes {
+export interface FastdbFindRes {
   data: {
     objects: any[]
     [key: string]: any
@@ -531,25 +295,25 @@ export interface IFastdbFindRes {
 }
 
 //set返回
-export interface IMongodbSetRes {
+export interface MongodbSetRes {
   data: {
-    insertedId?: string | number
+    acknowledged: boolean
+    insertedId: any
     [key: string]: any
   }
-  [key: string]: any
 }
-export interface IMysqlSetRes {
+export interface MysqlSetRes {
   data: {
     insertId?: string | number
     [key: string]: any
   }
   [key: string]: any
 }
-export interface IRedisSetRes {
+export interface RedisSetRes {
   data: any
   [key: string]: any
 }
-export interface IFastdbSetRes {
+export interface FastdbSetRes {
   data: {
     insertId?: string | number
     [key: string]: any
@@ -558,23 +322,33 @@ export interface IFastdbSetRes {
 }
 
 
+// setmany 返回
+export interface MongodbSetmanyRes {
+  data: {
+    acknowledged: boolean
+    insertedCount: number
+    insertedIds: {
+      [key: string]: any
+    }
+    [key: string]: any
+  }
+}
 
-export interface IMysqlGetRes {
+
+export interface MysqlGetRes {
   data: {
     id?: string | number
     [key: string]: any
   }
   [key: string]: any
 }
-export interface IMongodbGetRes {
+export interface MongodbGetRes {
   data: {
-    id?: string | number
-    _id?: string | number
+    _id: any
     [key: string]: any
   }
-  [key: string]: any
 }
-export interface IRedisGetRes {
+export interface RedisGetRes {
   data: {
     expireSec?: number
     expireMillisec?: number
@@ -582,7 +356,7 @@ export interface IRedisGetRes {
   }
   [key: string]: any
 }
-export interface IFastdbGetRes {
+export interface FastdbGetRes {
   data: {
     id?: string | number
     [key: string]: any
@@ -594,25 +368,31 @@ export interface IFastdbGetRes {
 
 
 
-export interface IMysqlUpdateRes {
+export interface MysqlUpdateRes {
   data: {
+    changedRows?: number
     [key: string]: any
   }
-  [key: string]: any
 }
-export interface IMongodbUpdateRes {
+export interface MysqlUpdatemanyRes {
   data: {
-    id?: string | number
-    _id?: string | number
+    affectedRows?: number
     [key: string]: any
   }
-  [key: string]: any
 }
-export interface IRedisUpdateRes {
+export interface MongodbUpdateRes {
+  data: {
+    acknowledged: boolean
+    modifiedCount: number
+    matchedCount: number
+    [key: string]: any
+  }
+}
+export interface RedisUpdateRes {
   data: any
   [key: string]: any
 }
-export interface IFastdbUpdateRes {
+export interface FastdbUpdateRes {
   data: {
     id?: string | number
     [key: string]: any
@@ -623,30 +403,31 @@ export interface IFastdbUpdateRes {
 
 
 //delete
-export interface IMysqlDeleteRes {
+export interface MysqlDeleteRes {
   data: {
     [key: string]: any
   }
   [key: string]: any
 }
-export interface IMongodbDeleteRes {
+export interface MongodbDeleteRes {
   data: {
+    acknowledged: boolean
+    deletedCount: number
     [key: string]: any
   }
-  [key: string]: any
 }
-export interface IRedisDeleteRes {
+export interface RedisDeleteRes {
   data: number
 }
-export interface IFastdbDeleteRes {
+export interface FastdbDeleteRes {
   data: number
 }
 
 
 // transiction
-export interface IMysqlTransactionRes {
+export interface MysqlTransactionRes {
   begin: (callback: Function) => void
-  run: (sql: string) => Promise<IMysqlGetRes | IMysqlSetRes | IMysqlFindRes | IMysqlDeleteRes | IMysqlUpdateRes>
+  run: (sql: string) => Promise<MysqlGetRes | MysqlSetRes | MysqlFindRes | MysqlDeleteRes | MysqlUpdateRes>
   rollback: Function
   commit: () => Promise<boolean>
   locks: {
@@ -667,6 +448,6 @@ export interface IMysqlTransactionRes {
 export type TStructure = 'string' | 'hash' | 'list' | 
 'set' | 'zset'
 
-export interface IRedisStringSet {
+export interface RedisStringSet {
   [key: string]: any
 }

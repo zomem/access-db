@@ -1,12 +1,11 @@
-import {mongodbId} from '../utils/dbConnect'
 import {PLATFORM_NAME, J_NAME_LIST} from '../constants/constants'
 import {FIND_CHECKR_ERROR, FIND_P_ERROR, FIND_P_BETWEEN_ERROR, FIND_NO_PJ_ERROR} from '../constants/error'
-import {changeFindGeoJson, isArray, isNumber} from './utils'
+import {changeFindGeoJson, isArray, changeSqlParam, isMongodbObjectId} from './utils'
 
-export default function findTrans<T>(params: T, r_num: number, query_data, minapp){
+export default function findTrans<T>(params: T, r_num: number, query_data, dbType){
   let rstring = `r${r_num === 1 ? '' : r_num}`
   if(!params[rstring]){
-    return false
+    return 2  //返回所有数据
   }
   let r = params[rstring].replace(/\s+/g,'')       //去掉空格
   let query: any  = {}
@@ -29,20 +28,27 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
   let ps = r.replace(/\(|\)/g, '').split(/&&|\|\|/g)
 
   //Mongo 
-  if(minapp === PLATFORM_NAME.MONGODB){
+  if(dbType === PLATFORM_NAME.MONGODB){
     for(let i = 0; i < ps.length; i++){
       query[ps[i]] = {}
       if(!params[ps[i]]) throw new Error(FIND_NO_PJ_ERROR + ps[i])
       //如果是_id，则要对数据进行转换
       if(params[ps[i]][0] === '_id'){
+        const {mongodbId} = require('../utils/dbMongodb')
         if(isArray(params[ps[i]][2])){
           params[ps[i]][2] = params[ps[i]][2].map(item => {
-            let tempId = mongodbId(item)
+            let tempId
+            if(isMongodbObjectId(item)){
+              tempId = item
+            }else{
+              tempId = mongodbId(item)
+            }
             return tempId
           })
         }else{
-          let tempId = mongodbId(params[ps[i]][2])
-          params[ps[i]][2] = tempId
+          if(!isMongodbObjectId(params[ps[i]][2])){
+            params[ps[i]][2] = mongodbId(params[ps[i]][2])
+          }
         }
       }
       switch(params[ps[i]][1]){
@@ -113,7 +119,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
             }
           }
           break
-        case '                                      ':
+        case 'geoWithin':
           query[ps[i]][params[ps[i]][0]] = {
             "$geoWithin": {
               "$geometry": changeFindGeoJson(params[ps[i]])
@@ -123,13 +129,16 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
         case 'isExists':
           query[ps[i]][params[ps[i]][0]] = {"$exists": params[ps[i]][2]}
           break
+        case 'type':
+          query[ps[i]][params[ps[i]][0]] = {"$type": params[ps[i]][2]}
+          break
         default:
           throw new Error(FIND_P_ERROR)
       }
     }
   }
   //mysql 
-  if(minapp === PLATFORM_NAME.MYSQL){
+  if(dbType === PLATFORM_NAME.MYSQL){
     for(let i = 0; i < ps.length; i++){
       query[ps[i]] = {}
       let tableName = '', fieldName = '', tempSelect = ''
@@ -151,18 +160,12 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
       if(isArray(params[ps[i]][2])){
         let tempArr = []
         for(let j = 0; j < params[ps[i]][2].length; j++){
-          if(isNumber(params[ps[i]][2][j])){
-            tempArr.push(`${params[ps[i]][2][j]}`)
-          }else{
-            tempArr.push(`'${params[ps[i]][2][j]}'`)
-          }
+          tempArr.push(changeSqlParam(params[ps[i]][2][j]))
         }
         tempParam = `(${tempArr.toString()})`
       }else{
         if(params[ps[i]][2].toString().indexOf('SELECT') > -1){
           tempParam = `(${params[ps[i]][2]})`
-        }else if(isNumber(params[ps[i]][2])){
-          tempParam = params[ps[i]][2]
         }else if(params[ps[i]][1] === 'regex'){
           let tempReg = params[ps[i]][2].toString()
           if(tempReg[0] === '/'){
@@ -178,7 +181,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
             tempParam = `'${params[ps[i]][2]}'`
           }
         }else{
-          tempParam = `'${params[ps[i]][2]}'`
+          tempParam = changeSqlParam(params[ps[i]][2])
         }
       }
 
@@ -186,8 +189,6 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
       if(params[ps[i]][3]){
         if(params[ps[i]][3].toString().indexOf('SELECT') > -1){
           tempParam2 = `(${params[ps[i]][3]})`
-        }else if(isNumber(params[ps[i]][3])){
-          tempParam2 = params[ps[i]][3]
         }else if(params[ps[i]][3].toString().indexOf('.') > -1){
           let tempPl = params[ps[i]][3].split('.')
           if(query_data.table.indexOf(tempPl[0]) > -1){
@@ -196,7 +197,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
             tempParam2 = `'${params[ps[i]][3]}'`
           }
         }else{
-          tempParam2 = `'${params[ps[i]][3]}'`
+          tempParam2 = changeSqlParam(params[ps[i]][3])
         }
       }
 
@@ -349,7 +350,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
     }
   }
   //fastdb
-  if(minapp === PLATFORM_NAME.FASTDB){
+  if(dbType === PLATFORM_NAME.FASTDB){
     for(let i = 0; i < ps.length; i++){
       query[ps[i]] = false  // 每一个p，是否通过
       if(!params[ps[i]]) throw new Error(FIND_NO_PJ_ERROR + ps[i])
@@ -424,13 +425,13 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
           let tempIn = qdata
           if(isArray(tempIn)){
             for(let a = 0; a < tempIn.length; a++){
-              if(params[ps[i]][2].includes(tempIn[a])){
+              if(params[ps[i]][2].indexOf(tempIn[a]) > -1){
                 query[ps[i]] = true
                 break
               }
             }
           }else{
-            if(params[ps[i]][2].includes(tempIn)){
+            if(params[ps[i]][2].indexOf(tempIn) > -1){
               query[ps[i]] = true
             }
           }
@@ -439,7 +440,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
           let tempNotIn = qdata
           if(isArray(tempNotIn)){
             for(let b = 0; b < tempIn.length; b++){
-              if(!params[ps[i]][2].includes(tempNotIn[b])){
+              if(!(params[ps[i]][2].indexOf(tempNotIn[b]) > -1)){
                 query[ps[i]] = true
               }else{
                 query[ps[i]] = false
@@ -447,7 +448,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
               }
             }
           }else{
-            if(!params[ps[i]][2].includes(tempNotIn)){
+            if(!(params[ps[i]][2].indexOf(tempNotIn) > -1)){
               query[ps[i]] = true
             }
           }
@@ -456,7 +457,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
           let tempArrCon = qdata
           if(isArray(tempArrCon)){
             for(let c = 0; c < params[ps[i]][2].length; c++){
-              if(tempArrCon.includes(params[ps[i]][2][c])){
+              if(tempArrCon.indexOf(params[ps[i]][2][c]) > -1){
                 query[ps[i]] = true
               }else{
                 query[ps[i]] = false
@@ -517,7 +518,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
       let tempQQ = query[tempArr[0]], n = 0
 
       //Mongo 类平台
-      if(minapp === PLATFORM_NAME.MONGODB){
+      if(dbType === PLATFORM_NAME.MONGODB){
         while(n < tempArr.length - 1){
           if(tempArr[n+1] === '&&'){
             tempQQ = {
@@ -534,7 +535,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
       }
 
       //mysql 类平台
-      if(minapp === PLATFORM_NAME.MYSQL){
+      if(dbType === PLATFORM_NAME.MYSQL){
         while (n < tempArr.length - 1) {
           if (tempArr[n + 1] === '&&') {
             tempQQ = `(${tempQQ} AND ${query[tempArr[n + 2]]})`
@@ -547,7 +548,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
       }
 
       // fastdb
-      if(minapp === PLATFORM_NAME.FASTDB){
+      if(dbType === PLATFORM_NAME.FASTDB){
         while(n < tempArr.length - 1){
           if(tempArr[n+1] === '&&'){
             if(tempQQ && query[tempArr[n+2]]){
@@ -582,7 +583,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
   let QQ = query[tempArr2[0]], n = 0
 
   //Mongo 类平台
-  if(minapp === PLATFORM_NAME.MONGODB){
+  if(dbType === PLATFORM_NAME.MONGODB){
     while(n < tempArr2.length - 1){
       if(tempArr2[n+1] === '&&'){
         QQ = {
@@ -599,7 +600,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
   }
 
   //mysql 类平台
-  if(minapp === PLATFORM_NAME.MYSQL){
+  if(dbType === PLATFORM_NAME.MYSQL){
     while (n < tempArr2.length - 1) {
       if (tempArr2[n + 1] === '&&') {
         QQ = `(${QQ} AND ${query[tempArr2[n + 2]]})`
@@ -612,7 +613,7 @@ export default function findTrans<T>(params: T, r_num: number, query_data, minap
   }
 
   // fastdb
-  if(minapp === PLATFORM_NAME.FASTDB){
+  if(dbType === PLATFORM_NAME.FASTDB){
     while(n < tempArr2.length - 1){
       if(tempArr2[n+1] === '&&'){
         if(QQ && query[tempArr2[n+2]]){

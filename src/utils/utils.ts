@@ -1,6 +1,9 @@
 import {GEO_POLYGON_ERROR} from '../constants/error'
 
 
+export const isMongodbObjectId = (value: any) => {
+  return value._bsontype === 'ObjectID'
+}
 export const isJson = (value: any) => {
   return typeof(value) === 'object'
 }
@@ -94,6 +97,36 @@ export const changeFindGeoJson = (lparams: any) => {  //['point', 'include', [23
 }
 
 
-
+// 返回mysql语句的参数类型
+export const changeSqlParam = (param: any) => {
+  let result: any = `'${param}'`
+  if(param){
+    // param 存在
+    if(isNumber(param)){
+      return result = param
+    }
+    if(typeof(param) === 'boolean'){
+      return result = 'TRUE'
+    }
+  }else{
+    // param 为否  可能为   null '' 0 false
+    if(typeof(param) === 'undefined'){
+      return result = `''`
+    }
+    if(typeof(param) === 'string'){
+      return result = `''`
+    }
+    if(typeof(param) === 'number' && !isNaN(param)){
+      return result = 0
+    }
+    if(typeof(param) === 'boolean'){
+      return result = 'FALSE'
+    }
+    if(typeof(param) === 'object'){
+      return result = 'NULL'
+    }
+  }
+  return result
+}
 
 

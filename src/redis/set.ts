@@ -1,6 +1,6 @@
 
-import {redisClient, redisExpire} from '../utils/dbConnect'
-import {TStructure, IRedisSetQuery, IRedisSetRes} from '../index'
+import {redisClient, redisExpire} from '../utils/dbRedis'
+import {TStructure, RedisSetQuery, RedisSetRes} from '../index'
 import setTrans from '../utils/setTrans'
 import { PLATFORM_NAME } from '../constants/constants'
 import {REDIS_SET_ERROR} from '../constants/error'
@@ -8,8 +8,8 @@ import {REDIS_SET_ERROR} from '../constants/error'
 
 
 
-function fetchSet(structure: 'string', params: any, query?: IRedisSetQuery): Promise<IRedisSetRes>
-function fetchSet(structure: TStructure, params: any = {}, query: IRedisSetQuery = {}): Promise<IRedisSetRes>{
+function fetchSet(structure: 'string', params: any, query?: RedisSetQuery): Promise<RedisSetRes>
+function fetchSet(structure: TStructure, params: any = {}, query: RedisSetQuery = {}): Promise<RedisSetRes>{
   return new Promise((resolve, reject)=>{
     let tempSet: {keyValue: any[], method: string, key: string[]} = setTrans(params, {structure, ...query}, PLATFORM_NAME.REDIS)
     if(tempSet.keyValue.length < 2){

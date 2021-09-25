@@ -1,5 +1,5 @@
 import {pathTo} from '../utils/pathTo'
-import {IFastdbCheckParams, IFastdbFindRes} from '../index'
+import {FastdbCheckParams, FastdbFindRes} from '../index'
 import { PLATFORM_NAME } from '../constants/constants'
 import {FASTDB_FILE_ERROR} from '../constants/error'
 import findTrans from '../utils/findTrans'
@@ -7,7 +7,7 @@ import findTrans from '../utils/findTrans'
 const fs = require('fs')
 const POSITION_STEP = 9
 
-function fetchFind(table: string, params: IFastdbCheckParams): IFastdbFindRes {
+function fetchFind(table: string, params: FastdbCheckParams = {}): FastdbFindRes {
   const filePath = pathTo(table)
   let oldBuf, result: any[] = []
   if (!fs.existsSync(filePath)) {

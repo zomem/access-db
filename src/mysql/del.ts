@@ -7,17 +7,17 @@
  * @FilePath: /minapp-fetch/src/fetch/data/delete.ts
  */
 
-import {mysqlConnect} from '../utils/dbConnect'
-import {isNumber, isJson} from '../utils/utils'
-import {TTable, IMysqlDeleteRes, TSentence, IMysqlGetKey} from '../index'
+import {mysqlConnect} from '../utils/dbMysql'
+import {changeSqlParam, isJson} from '../utils/utils'
+import {TTable, MysqlDeleteRes, TSentence, MysqlGetKey} from '../index'
 
-function fetchDel(table: TTable, uniKey: string | number | IMysqlGetKey): Promise<IMysqlDeleteRes>
-function fetchDel(table: TTable, uniKey: string | number | IMysqlGetKey, query: TSentence): Promise<string>
-function fetchDel(table: TTable, uniKey: string | number | IMysqlGetKey, query?: TSentence): Promise<IMysqlDeleteRes | string>{
+function fetchDel(table: TTable, uniKey: string | number | MysqlGetKey): Promise<MysqlDeleteRes>
+function fetchDel(table: TTable, uniKey: string | number | MysqlGetKey, query: TSentence): Promise<string>
+function fetchDel(table: TTable, uniKey: string | number | MysqlGetKey, query?: TSentence): Promise<MysqlDeleteRes | string>{
   return new Promise((resolve, reject)=>{
     let tempID='id', tempData
     if(isJson(uniKey)){
-      for(let p in uniKey as IMysqlGetKey){
+      for(let p in uniKey as MysqlGetKey){
         tempID=p
         tempData=uniKey[p]
         break
@@ -29,7 +29,7 @@ function fetchDel(table: TTable, uniKey: string | number | IMysqlGetKey, query?:
     let sql = ''
     sql = `DELETE `
     + `FROM ${table} `
-    + `WHERE ${tempID} = ${isNumber(tempData) ? tempData : `'${tempData}'`}`
+    + `WHERE ${tempID} = ${changeSqlParam(tempData)}`
     if(query === 'sentence'){
       resolve(sql)
       return

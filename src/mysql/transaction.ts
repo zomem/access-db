@@ -1,10 +1,10 @@
 
-import {mysqlPool} from '../utils/dbConnect'
+import {mysqlPool} from '../utils/dbMysql'
 import {isArray} from '../utils/utils'
-import {IMysqlGetRes, IMysqlSetRes, IMysqlFindRes, IMysqlDeleteRes, IMysqlUpdateRes, IMysqlTransactionRes} from '../index'
+import {MysqlGetRes, MysqlSetRes, MysqlFindRes, MysqlDeleteRes, MysqlUpdateRes, MysqlTransactionRes} from '../index'
 
 
-type TRun = IMysqlGetRes | IMysqlSetRes | IMysqlFindRes | IMysqlDeleteRes | IMysqlUpdateRes
+type TRun = MysqlGetRes | MysqlSetRes | MysqlFindRes | MysqlDeleteRes | MysqlUpdateRes
 
 let pool = mysqlPool()
 
@@ -29,7 +29,7 @@ function getConnection(): Promise<any>{
 
 
 
-function fetchTransaction(): Promise<IMysqlTransactionRes>{
+function fetchTransaction(): Promise<MysqlTransactionRes>{
   return new Promise(async (resolve_all, reject_all) => {
     let connection = await getConnection()
 

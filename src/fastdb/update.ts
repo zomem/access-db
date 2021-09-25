@@ -1,5 +1,5 @@
 import {pathTo} from '../utils/pathTo'
-import {IFastdbUpdateRes, IFastdbUpdateParams} from '../index'
+import {FastdbUpdateRes, FastdbUpdateParams} from '../index'
 import {FASTDB_FILE_ERROR, FASTDB_GET_ID_ERROR, FASTDB_UPDATE_ID_ERROR} from '../constants/error'
 import {isNumber} from '../utils/utils'
 import updateTrans from '../utils/updateTrans'
@@ -8,7 +8,7 @@ import { PLATFORM_NAME } from '../constants/constants'
 const fs = require('fs')
 
 
-function fetchUpdate(table: string, id: string | number, params: IFastdbUpdateParams): IFastdbUpdateRes {
+function fetchUpdate(table: string, id: string | number, params: FastdbUpdateParams): FastdbUpdateRes {
   const filePath = pathTo(table)
   let oldBuf, result, tempJson, start=-1, end=-1
   if (!fs.existsSync(filePath)) {

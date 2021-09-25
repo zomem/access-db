@@ -7,17 +7,17 @@
  * @FilePath: /@ownpack/weapp/src/fetch/data/set.ts
  */ 
 
-import {mysqlConnect} from '../utils/dbConnect'
-import {TTable, IMysqlSetParams, IMysqlSetRes, TSentence} from '../index'
+import {mysqlConnect} from '../utils/dbMysql'
+import {TTable, MysqlSetParams, MysqlSetRes, TSentence} from '../index'
 import setTrans from '../utils/setTrans'
 import { PLATFORM_NAME } from '../constants/constants'
 
 
-function fetchSet(table: TTable, params: IMysqlSetParams): Promise<IMysqlSetRes>
-function fetchSet(table: TTable, params: IMysqlSetParams, query: TSentence): Promise<string>
-function fetchSet(table: TTable, params: IMysqlSetParams = {}, query?: TSentence): Promise<IMysqlSetRes | string>{
+function fetchSet(table: TTable, params: MysqlSetParams): Promise<MysqlSetRes>
+function fetchSet(table: TTable, params: MysqlSetParams, query: TSentence): Promise<string>
+function fetchSet(table: TTable, params: MysqlSetParams = {}, query?: TSentence): Promise<MysqlSetRes | string>{
   return new Promise((resolve, reject)=>{
-    let tempSet: any = setTrans<IMysqlSetParams>(params, {}, PLATFORM_NAME.MYSQL)
+    let tempSet: any = setTrans<MysqlSetParams>(params, {}, PLATFORM_NAME.MYSQL)
     let sql = `INSERT INTO ${table}(${tempSet.fieldsArr.toString()}) VALUES (${tempSet.valuesArr.toString()})`
     if(query === 'sentence'){
       resolve(sql)

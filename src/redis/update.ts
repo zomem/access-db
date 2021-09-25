@@ -1,12 +1,12 @@
 
-import {redisClient} from '../utils/dbConnect'
-import {TStructure, IRedisUpdateRes, IRedisUpdateParams, IRedisStringUpdateParams} from '../index'
+import {redisClient} from '../utils/dbRedis'
+import {TStructure, RedisUpdateRes, RedisUpdateParams, RedisStringUpdateParams} from '../index'
 import updateTrans from '../utils/updateTrans'
 import {PLATFORM_NAME} from '../constants/constants'
 import {REDIS_SET_ERROR} from '../constants/error'
 
-function fetchUpdate(structure: 'string', params: IRedisStringUpdateParams): Promise<IRedisUpdateRes | string>
-function fetchUpdate(structure: TStructure, params: IRedisUpdateParams = {}): Promise<IRedisUpdateRes | string>{
+function fetchUpdate(structure: 'string', params: RedisStringUpdateParams): Promise<RedisUpdateRes | string>
+function fetchUpdate(structure: TStructure, params: RedisUpdateParams = {}): Promise<RedisUpdateRes | string>{
   return new Promise((resolve, reject)=>{
     let tempData: {keyValue: any[], method: string, key: string[]} = updateTrans(params, {structure}, PLATFORM_NAME.REDIS)
     if(tempData.keyValue.length < 2){
