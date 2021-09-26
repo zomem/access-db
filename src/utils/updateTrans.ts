@@ -92,29 +92,29 @@ export default function updateTrans<T>(params: T, query, dbType){
       if(!isArray(params[pa])){
         //不是数组，则直接 set
         operate.push(`${pa} = ${changeSqlParam(params[pa])}`)
-        continue
-      }
-      if(MYSQL_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
-        switch(params[pa][0]){
-          case 'set':
-            operate.push(`${pa} = ${changeSqlParam(params[pa][1])}`)
-            break
-          case 'unset':
-            operate.push(`${pa} = NULL`)
-            break
-          case 'incr':
-            if(params[pa][1] >= 0){
-              operate.push(`${pa} = ${pa} + ${params[pa][1]}`)
-            }else{
-              operate.push(`${pa} = ${pa} - ${Math.abs(params[pa][1])}`)
-            }
-            break
-          default:
-            throw new Error(UPDATE_ERROR)
-        }
       }else{
-        //直接 set
-        operate.push(`${pa} = ${changeSqlParam(params[pa])}`)
+        if(MYSQL_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
+          switch(params[pa][0]){
+            case 'set':
+              operate.push(`${pa} = ${changeSqlParam(params[pa][1])}`)
+              break
+            case 'unset':
+              operate.push(`${pa} = NULL`)
+              break
+            case 'incr':
+              if(params[pa][1] >= 0){
+                operate.push(`${pa} = ${pa} + ${params[pa][1]}`)
+              }else{
+                operate.push(`${pa} = ${pa} - ${Math.abs(params[pa][1])}`)
+              }
+              break
+            default:
+              throw new Error(UPDATE_ERROR)
+          }
+        }else{
+          //直接 set
+          operate.push(`${pa} = ${changeSqlParam(params[pa])}`)
+        }
       }
     }
     result = operate

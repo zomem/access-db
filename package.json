@@ -1,6 +1,6 @@
 {
   "name": "access-db",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Unified access to all kinds of databases",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -17,6 +17,7 @@
     "type": "git",
     "url": "https://github.com/zomem/access-db"
   },
+  "homepage": "https://access-db.cn/",
   "dependencies": {
     "mongodb": "^4.1.1",
     "mysql": "^2.18.1",

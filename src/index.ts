@@ -4,7 +4,7 @@ import mongodb_temp from './mongodb/index'
 import mysql_temp from './mysql/index'
 import redis_temp from './redis/index'
 import fastdb_temp from './fastdb'
-import promiseLimit_temp from './common/promiseLimit'
+import promiselimit_temp from './common/promiselimit'
 
 
 
@@ -12,14 +12,14 @@ export const mongodb = mongodb_temp
 export const mysql = mysql_temp
 export const redis = redis_temp
 export const fastdb = fastdb_temp
-export const promiseLimit = promiseLimit_temp
+export const promiselimit = promiselimit_temp
 
 export default {
   mongodb: mongodb_temp,
   mysql: mysql_temp,
   redis: redis_temp,
   fastdb: fastdb_temp,
-  promiseLimit: promiseLimit_temp
+  promiselimit: promiselimit_temp
 }
 
 
@@ -205,7 +205,7 @@ export interface MysqlUpdateParams {
 }
 export interface MysqlUpdatemanyParams{
   [key: number]: {
-    [keyi: string]: any
+    [keyi: string]: [TMysqlUpdateMethod, dataType] | dataType
   }
 }
 export interface MysqlUpdateKey{
