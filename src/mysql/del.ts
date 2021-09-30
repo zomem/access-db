@@ -31,8 +31,7 @@ function fetchDel(table: TTable, uniKey: string | number | MysqlGetKey, query?: 
     + `FROM ${table} `
     + `WHERE ${tempID} = ${changeSqlParam(tempData)}`
     if(query === 'sentence'){
-      resolve(sql)
-      return
+      return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results) => {
       if (err) {

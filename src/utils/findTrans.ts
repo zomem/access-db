@@ -164,21 +164,25 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
         }
         tempParam = `(${tempArr.toString()})`
       }else{
-        if(params[ps[i]][2].toString().indexOf('SELECT') > -1){
-          tempParam = `(${params[ps[i]][2]})`
-        }else if(params[ps[i]][1] === 'regex'){
-          let tempReg = params[ps[i]][2].toString()
-          if(tempReg[0] === '/'){
-            tempParam = `'${tempReg.replace(/^\//ig, '').replace(/(\/|\/i|\/g|\/ig|\/gi|\/m)$/ig, '').replace(/\\/ig, '\\\\')}'`
+        if(params[ps[i]][2]){
+          if(params[ps[i]][2].toString().indexOf('SELECT') > -1){
+            tempParam = `(${params[ps[i]][2]})`
+          }else if(params[ps[i]][1] === 'regex'){
+            let tempReg = params[ps[i]][2].toString()
+            if(tempReg[0] === '/'){
+              tempParam = `'${tempReg.replace(/^\//ig, '').replace(/(\/|\/i|\/g|\/ig|\/gi|\/m)$/ig, '').replace(/\\/ig, '\\\\')}'`
+            }else{
+              tempParam = `'${tempReg}'`
+            }
+          }else if(params[ps[i]][2].toString().indexOf('.') > -1){
+            let tempPl = params[ps[i]][2].split('.')
+            if(query_data.table.indexOf(tempPl[0]) > -1){
+              tempParam = `${query_data.tableHash[tempPl[0]]}.${tempPl[1]}`
+            }else{
+              tempParam = `'${params[ps[i]][2]}'`
+            }
           }else{
-            tempParam = `'${tempReg}'`
-          }
-        }else if(params[ps[i]][2].toString().indexOf('.') > -1){
-          let tempPl = params[ps[i]][2].split('.')
-          if(query_data.table.indexOf(tempPl[0]) > -1){
-            tempParam = `${query_data.tableHash[tempPl[0]]}.${tempPl[1]}`
-          }else{
-            tempParam = `'${params[ps[i]][2]}'`
+            tempParam = changeSqlParam(params[ps[i]][2])
           }
         }else{
           tempParam = changeSqlParam(params[ps[i]][2])

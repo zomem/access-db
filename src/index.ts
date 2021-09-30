@@ -173,7 +173,7 @@ export interface FastdbCheckParams extends FastdbPRList {
 
 
 export interface MysqlCountParams extends MysqlPRList {
-  limit?: 1
+  
 }
 export interface MongodbCountParams extends MongodbPRList {
   limit?: 1

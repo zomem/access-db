@@ -23,8 +23,7 @@ function fetchUpdate(table: TTable, uniKey: string | number | MysqlUpdateKey, pa
     let updata: any = updateTrans<MysqlUpdateParams>(params, [], PLATFORM_NAME.MYSQL)
     let sql = `UPDATE ${table} SET ${updata.toString()} WHERE ${tempID} = ${changeSqlParam(tempData)}`
     if(query === 'sentence'){
-      resolve(sql)
-      return
+      return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results) => {
       if (err) {

@@ -288,8 +288,7 @@ function fetchFind(table: TTable, params: MysqlCheckParams = {}, query?: TSenten
     sql = sql.replace(/\s+/ig, ' ')
 
     if(query === 'sentence'){
-      resolve(sql)
-      return
+      return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results, fields) => {
       if (err) {

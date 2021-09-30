@@ -5,16 +5,16 @@
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /@ownpack/weapp/src/fetch/data/get.ts
- */ 
+ */
 
 import {mysqlConnect} from '../utils/dbMysql'
 import {isArray, changeSqlParam, isJson} from '../utils/utils'
 import {MysqlGetRes, TTable, MysqlGetKey, MysqlGetQuery, TSentence} from '../index'
 
 function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery): Promise<MysqlGetRes>
-function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query: TSentence): Promise<string>
-function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery | TSentence): Promise<MysqlGetRes | string>{
-  let tempQuery = (query === 'sentence' || !query) ? {} : query
+function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery, queryt?: TSentence): Promise<string>
+function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery, queryt?: TSentence): Promise<MysqlGetRes | string>{
+  let tempQuery = !query ? {} : query
 
   return new Promise((resolve, reject)=>{
     let selectArr = []
@@ -44,9 +44,8 @@ function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: 
     sql = `SELECT ${selectArr.length > 0 ? selectArr.toString() + ' ' : '* '}`
     + `FROM ${table} `
     + `WHERE ${tempID} = ${changeSqlParam(tempData)}`
-    if(query === 'sentence'){
-      resolve(sql)
-      return
+    if(queryt === 'sentence'){
+      return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results) => {
       if (err) {

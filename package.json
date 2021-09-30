@@ -1,6 +1,6 @@
 {
   "name": "access-db",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Unified access to all kinds of databases",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

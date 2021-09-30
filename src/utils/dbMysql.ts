@@ -21,6 +21,7 @@ const pool = process.env.MYSQL_HOST ? _mysql.createPool({
   port: parseInt(process.env.MYSQL_PORT) || 3306,
   charset: process.env.MYSQL_CHARSET || 'UTF8_GENERAL_CI'
 }) : null
+
 export const mysqlPool = () => {
   return pool
 }

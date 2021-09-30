@@ -20,8 +20,7 @@ function fetchSet(table: TTable, params: MysqlSetParams = {}, query?: TSentence)
     let tempSet: any = setTrans<MysqlSetParams>(params, {}, PLATFORM_NAME.MYSQL)
     let sql = `INSERT INTO ${table}(${tempSet.fieldsArr.toString()}) VALUES (${tempSet.valuesArr.toString()})`
     if(query === 'sentence'){
-      resolve(sql)
-      return
+      return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results) => {
       if (err) {

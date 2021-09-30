@@ -30,8 +30,7 @@ function fetchSetmany(table: TTable, params: MysqlSetParams[], query?: TSentence
 
     let sql = `INSERT INTO ${table}(${fields.toString()}) VALUES ${values.toString()}`
     if(query === 'sentence'){
-      resolve(sql)
-      return
+      return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results) => {
       if (err) {

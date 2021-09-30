@@ -33,10 +33,13 @@ function fetchTransaction(): Promise<MysqlTransactionRes>{
   return new Promise(async (resolve_all, reject_all) => {
     let connection = await getConnection()
 
+    let isTran = false  // 事务是否开启
+
     // 回滚事务
     let rollback = (): Promise<boolean> => {
       return new Promise((resolve, reject) => {
         connection.rollback(() => {
+          connection.release()
           resolve(true)
         })
       })
@@ -46,10 +49,14 @@ function fetchTransaction(): Promise<MysqlTransactionRes>{
     let run = (sql): Promise<TRun> => {
       return new Promise(async (resolve, reject) => {
         try{
+          if(!isTran){
+            connection.release()
+            reject('事务未开启')
+          }
           let run_res: TRun = {
             data: {},
             objects: []
-        }
+          }
           let jsonStr = JSON.stringify(await connectQuery(connection, sql))
           let jsonRes = JSON.parse(jsonStr)
           if(isArray(jsonRes)){
@@ -61,6 +68,7 @@ function fetchTransaction(): Promise<MysqlTransactionRes>{
           }
           resolve(run_res)
         }catch(run_err){
+          connection.release()
           reject(run_err)
         }
       })
@@ -70,11 +78,15 @@ function fetchTransaction(): Promise<MysqlTransactionRes>{
     let begin = (callback) => {
       return new Promise((resolve, reject) => {
         connection.beginTransaction(async (err) => {
-          if(err) reject(err)
-          await callback()
-          resolve(true)
+          if(err) {
+            isTran = false
+            reject(err)
+          }else{
+            isTran = true
+            await callback()
+            resolve(true)
+          }
         })
-        connection.release()
       })
     }
 
@@ -83,7 +95,11 @@ function fetchTransaction(): Promise<MysqlTransactionRes>{
     let commit = (): Promise<boolean> => {
       return new Promise((resolve, reject) => {
         connection.commit((err) => {
-          if(err) reject(err)
+          if(err) {
+            connection.release()
+            reject(err)
+          }
+          connection.release()
           resolve(true)
         })
       })
@@ -95,12 +111,11 @@ function fetchTransaction(): Promise<MysqlTransactionRes>{
       rollback,
       commit,
       locks: {
-        shared_locks: ' lock in share mode',
-        exclusive_locks: ' for update'
+        shared_locks: ' LOCK IN SHARE MODE',
+        exclusive_locks: ' FOR UPDATE'
       }
     })
   })
 }
-
 
 export default fetchTransaction

@@ -7,9 +7,9 @@
 
 | 数据库  | 说明                                          | 支持版本 |
 | ------- | --------------------------------------------- | :------- |
-| FastDB  | 本地json文件数据库<br />[由access_db团队开发]  | 0.0.4    |
+| FastDB  | 本地json文件数据库<br />\[由access_db团队开发\]  | 0.0.6    |
 | MongoDB | 分布式文件存储数据库                          | 4.x      |
-| Mysql   | 关系型数据库                                  | 8.0, 5.x |
+| Mysql   | 关系型数据库                                  | 8.x, 5.x |
 | redis   | 高性能的 key-value 数据库                     | 6.x, 5.x |
 
 
@@ -20,27 +20,31 @@
 
 2. 在项目根目录新建`.env`文件，然后填写配置信息  
 > yarn add dotenv  
-然后在项目最开始尽可能早的引入`require('dotenv').config()`  
+然后在项目最开始，尽可能早的引入`require('dotenv').config()`  
 `.env`配置如下  
+  
+> MYSQL_HOST  MONGODB_HOST  REDIS_HOST  FASTDB_DIR
+> 你使用什么数据库，则对应的地址就必填，不使用则不填
+        
 ```c
-  MYSQL_HOST=localhost   // 必填，不填则表示不使用该数据库
+  MYSQL_HOST=localhost   // 非必填，不填则表示不使用该数据库
   MYSQL_USER=root
   MYSQL_PASSWORD=123456
   MYSQL_PORT=3306
-  MYSQL_DATABASE=    // 必填  数据库名
+  MYSQL_DATABASE=
   # 默认UTF8_GENERAL_CI
   # MYSQL_CHARSET=
   # 最大连接数，默认10
   # MYSQL_CONNECTION_LIMIT=
 
 
-  MONGODB_HOST=localhost    // 必填，不填则表示不使用该数据库
+  MONGODB_HOST=localhost    // 非必填，不填则表示不使用该数据库
   MONGODB_USER=
   MONGODB_PASSWORD=
-  MONGODB_DATABASE=        // 必填  数据库名
+  MONGODB_DATABASE=
   MONGODB_PORT=
 
-  REDIS_HOST=localhost    // 必填，不填则表示不使用该数据库
+  REDIS_HOST=localhost    // 非必填，不填则表示不使用该数据库
   REDIS_PORT=
 
 
@@ -73,9 +77,9 @@ At present, the supported databases are as follows:
 
 | database | introduction                                                 | supported version |
 | -------- | ------------------------------------------------------------ | :---------------- |
-| FastDB   | Local JSON file database<br /> [by access_ DB team development] | 0.0.4             |
+| FastDB   | Local JSON file database<br /> \[by access_ DB team development\] | 0.0.6             |
 | MongoDB  | Distributed file storage database                            | 4.x               |
-| Mysql    | Relational database                                          | 8.0, 5.x          |
+| Mysql    | Relational database                                          | 8.x, 5.x          |
 | redis    | High performance key value database                          | 6.x, 5.x          |
 
 
@@ -88,32 +92,35 @@ At present, the supported databases are as follows:
 > yarn add dotenv  
 Then introduce `require('dotenv').config()` as early as possible at the beginning of the project   
 `.env` is configured as follows  
-
+  
+> MYSQL_HOST  MONGODB_HOST  REDIS_HOST  FASTDB_DIR
+> If you use any database, the corresponding address is required, and if you do not use it, it will be empty.
+    
 ```c  
-  MYSQL_HOST=localhost   // need，if it's undefined, the db will not be used
+  MYSQL_HOST=localhost   // not need，if it's undefined, the db will not be used
   MYSQL_USER=root
   MYSQL_PASSWORD=123456
   MYSQL_PORT=3306
-  MYSQL_DATABASE=        // need
+  MYSQL_DATABASE=
   # Default: UTF8_GENERAL_CI
   # MYSQL_CHARSET=
-  # The maximum number of connections to create at once. (Default: 10)  
+  # The maximum number of connections to create at once. (Default: 10)
   # MYSQL_CONNECTION_LIMIT= 
 
-  MONGODB_HOST=localhost    // need，if it's undefined, the db will not be used
+  MONGODB_HOST=localhost    // not need，if it's undefined, the db will not be used
   MONGODB_USER=
   MONGODB_PASSWORD=
-  MONGODB_DATABASE=           // need
+  MONGODB_DATABASE=
   MONGODB_PORT=
   
-  REDIS_HOST=localhost    // need，if it's undefined, the db will not be used
+  REDIS_HOST=localhost    // not need，if it's undefined, the db will not be used
   REDIS_PORT=
 
   FASTDB_DIR=   // the dir of fastdb. default is project's root
 ```
 
 
-3. use:   
+1. use:   
 ```js 
 import {mysql, mongodb} from 'access-db'
 

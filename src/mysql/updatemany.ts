@@ -20,8 +20,7 @@ function fetchUpdateMany(table: TTable, key: string[] | string, params: MysqlUpd
     let updata: string = updatemanyTrans<MysqlUpdatemanyParams>(params, {table, tempKey}, PLATFORM_NAME.MYSQL)
     let sql = `UPDATE ${table} JOIN ${updata}`
     if(query === 'sentence'){
-      resolve(sql)
-      return
+      return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results) => {
       if (err) {

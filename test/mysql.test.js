@@ -1,6 +1,5 @@
 require('dotenv').config()
 
-const { ObjectId } = require('mongodb')
 const {mysql} = require('../lib/index')
 
 
@@ -42,6 +41,16 @@ const DATA_M = [
 
 
 test('mysql_updatemany_test: ', async () => {
+  let num = (await mysql.count('money', {
+    p0: ['uid', '>', 1],
+    r: 'p0'
+  })).data
+  let sql = await mysql.count('money', {
+    p0: ['uid', '>', 1],
+    r: 'p0'
+  }, 'sentence')
+  console.log('数据计数：：：', num, sql)
+  return
 
   let res2 = await mysql.updatemany('test', ['id', 'code'], [
     {
@@ -105,5 +114,73 @@ test('mysql_updatemany_test: ', async () => {
 })
 
 
+const wait = async () => {
+  
+}
+const timeSp = async (t) => {
+  return new Promise((resolve, reject) => {
+    if(t){
+      setTimeout(() => {
+        resolve('ok')
+      }, 3000);
+    }else{
+      setTimeout(() => {
+        reject('time errsa')
+      }, 3000);
+    }
+  })
+}
 
 
+
+test.concurrent('mysql_transition_test: ', async () => {
+  console.log('++++++++++++++++++')
+  async function one(i) {
+    const {begin, commit, rollback, run, locks} = await mysql.transaction()
+  
+    await begin(async () => {
+      try{
+        const book_id = 1
+        let tempdata = (await run(await mysql.get('book', book_id, {}, 'sentence') + locks.exclusive_locks)).data
+        
+        await run(await mysql.update('book', book_id, {num: ['incr', -1]}, 'sentence'))
+        console.log('111111111,,,,,,,,,', i)
+        
+
+        await run(await mysql.update('money', 1, {money: ['incr', -tempdata.price]}, 'sentence'))
+        //await timeSp(true)
+        // if(i === 20){
+        //   console.log('22020202020202020202020202020')
+        //   return await rollback()
+        // }
+
+        await run(await mysql.update('money', 2, {money: ['incr', tempdata.price]}, 'sentence'))
+        
+        
+        if(tempdata.num < 1){
+          console.log('samll>>>>>>>>>>>>')
+          return await rollback()
+        }
+
+
+        console.log('333333333')
+        // await timeSp(0)
+        // if(1 > 0){
+        //   console.log('iffff')
+        //   return await rollback()
+        // }
+        await commit()
+        console.log('444444444')
+      }catch(err){
+        console.log('555555555', err)
+        await rollback()
+        throw new Error('errrrr', err)
+      }
+    })
+  }
+
+  for(let i = 0; i < 2; i++){
+    await one(i)
+  }
+
+}, 15000)

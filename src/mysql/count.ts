@@ -15,7 +15,6 @@ function fetchCount(table: TTable, params: MysqlCountParams, query: TSentence): 
 function fetchCount(table: TTable, params: MysqlCountParams = {}, query?: TSentence): Promise<CountRes | string>{
   return new Promise((resolve, reject)=>{
     //mysql类
-    params.limit = 1
     if(query === 'sentence'){
       fetchFind(table, {
         j0: ['*', 'count'],
