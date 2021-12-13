@@ -1,48 +1,37 @@
 
-import {redisClient, redisExpire} from '../utils/dbRedis'
-import {TStructure, RedisSetQuery, RedisSetRes} from '../index'
+import {redisClient} from '../utils/dbRedis'
+import {TTable, RedisSetRes, RedisSetParams} from '../index'
 import setTrans from '../utils/setTrans'
 import { PLATFORM_NAME } from '../constants/constants'
-import {REDIS_SET_ERROR} from '../constants/error'
 
 
 
-
-function fetchSet(structure: 'string', params: any, query?: RedisSetQuery): Promise<RedisSetRes>
-function fetchSet(structure: TStructure, params: any = {}, query: RedisSetQuery = {}): Promise<RedisSetRes>{
-  return new Promise((resolve, reject)=>{
-    let tempSet: {keyValue: any[], method: string, key: string[]} = setTrans(params, {structure, ...query}, PLATFORM_NAME.REDIS)
-    if(tempSet.keyValue.length < 2){
-      throw new Error(REDIS_SET_ERROR)
-    }
-    
-    redisClient[tempSet.method](...tempSet.keyValue, async (err, reply) => {
-      try{
-        if (err) {
-          reject({err})
+function fetchSet(table: TTable, params: RedisSetParams = {}, expire?: number): Promise<RedisSetRes>{
+  return new Promise(async (resolve, reject)=>{
+    try{
+      const tempData = setTrans<RedisSetParams>(params, table, PLATFORM_NAME.REDIS)
+      let func: any = [], hkey: any = ''
+      for(let i = 0; i < tempData.length; i++){
+        switch(tempData[i].method){
+          case 'SETNX':
+            func.push(redisClient[tempData[i].method](tempData[i].key, tempData[i].value))
+            if(expire) func.push(redisClient.PEXPIRE(tempData[i].key, expire))
+            break
+          case 'HSETNX':
+            hkey = tempData[i].key
+            func.push(redisClient[tempData[i].method](tempData[i].key, ...tempData[i].value))
+            break
+          default:
+            break
         }
-        if(query.expireSec){
-          for(let k = 0; k < tempSet.key.length; k++){
-            await redisExpire(tempSet.key[k], query.expireSec, 1)
-          }
-        }else if(query.expireMillisec){
-          for(let k = 0; k < tempSet.key.length; k++){
-            await redisExpire(tempSet.key[k], query.expireMillisec, 2)
-          }
-        }else if(query.expireAt){
-          for(let k = 0; k < tempSet.key.length; k++){
-            await redisExpire(tempSet.key[k], query.expireAt, 3)
-          }
-        }else if(query.expireMilliAt){
-          for(let k = 0; k < tempSet.key.length; k++){
-            await redisExpire(tempSet.key[k], query.expireMilliAt, 4)
-          }
-        }
-        resolve({data: reply})
-      }catch(err2){
-        reject(err2)
       }
-    })
+      if(expire) func.push(redisClient.PEXPIRE(hkey, expire))
+      func.push(redisClient.HGET(hkey, 'id'))
+      const rData = await Promise.all(func)
+      resolve({data: {insertId: rData[rData.length - 1] as string}})
+    }catch(err: any){
+      reject(err)
+    }
   })
 }
 

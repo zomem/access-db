@@ -12,9 +12,10 @@ import {isArray, changeSqlParam, isJson} from '../utils/utils'
 import {MysqlGetRes, TTable, MysqlGetKey, MysqlGetQuery, TSentence} from '../index'
 
 function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery): Promise<MysqlGetRes>
-function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery, queryt?: TSentence): Promise<string>
-function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery, queryt?: TSentence): Promise<MysqlGetRes | string>{
-  let tempQuery = !query ? {} : query
+function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery | TSentence, queryt?: TSentence): Promise<string>
+function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: MysqlGetQuery | TSentence, queryt?: TSentence): Promise<MysqlGetRes | string>{
+  let tempQuery: MysqlGetQuery = (!query ? {} : query) as MysqlGetQuery
+  let tempSen = query === 'sentence' ? 'sentence' : ''
 
   return new Promise((resolve, reject)=>{
     let selectArr = []
@@ -44,7 +45,7 @@ function fetchGet(table: TTable, uniKey: string | number | MysqlGetKey, query?: 
     sql = `SELECT ${selectArr.length > 0 ? selectArr.toString() + ' ' : '* '}`
     + `FROM ${table} `
     + `WHERE ${tempID} = ${changeSqlParam(tempData)}`
-    if(queryt === 'sentence'){
+    if(queryt === 'sentence' || tempSen === 'sentence'){
       return resolve(sql)
     }
     mysqlConnect(sql, [], (err, results) => {

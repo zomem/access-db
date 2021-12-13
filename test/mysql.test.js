@@ -41,6 +41,7 @@ const DATA_M = [
 
 
 test('mysql_updatemany_test: ', async () => {
+  
   let num = (await mysql.count('money', {
     p0: ['uid', '>', 1],
     r: 'p0'
@@ -50,7 +51,6 @@ test('mysql_updatemany_test: ', async () => {
     r: 'p0'
   }, 'sentence')
   console.log('数据计数：：：', num, sql)
-  return
 
   let res2 = await mysql.updatemany('test', ['id', 'code'], [
     {
@@ -85,6 +85,17 @@ test('mysql_updatemany_test: ', async () => {
     }
   ])
   console.log('rrrr2222', res2)
+
+  let tempGet = await mysql.get('test', 4, {select: ['name']})
+  console.log('1111', tempGet)
+  tempGet = await mysql.get('test', 4)
+  console.log('2222', tempGet)
+  tempGet = await mysql.get('test', 4, {}, 'sentence')
+  console.log('3333', tempGet)
+  tempGet = await mysql.get('test', 4, {select: ['name']}, 'sentence')
+  console.log('4444', tempGet)
+  tempGet = await mysql.get('test', 4, 'sentence')
+  console.log('5555', tempGet)
 
 
   let res = await mysql.updatemany('test', ['id', 'code'], [
@@ -134,6 +145,7 @@ const timeSp = async (t) => {
 
 
 test.concurrent('mysql_transition_test: ', async () => {
+  return
   console.log('++++++++++++++++++')
   async function one(i) {
     const {begin, commit, rollback, run, locks} = await mysql.transaction()

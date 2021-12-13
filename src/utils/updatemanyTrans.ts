@@ -3,8 +3,7 @@ import {
   MONGODB_UPDATE_METHORD,
   MYSQL_UPDATE_METHORD, 
   REDIS_UPDATE_METHORD,
-  FASTDB_UPDATE_METHORD,
-  REDIS_STRUCTURE
+  FASTDB_UPDATE_METHORD
 } from '../constants/constants'
 import {isArray, changeSqlParam} from './utils'
 import {UPDATE_ERROR} from '../constants/error'

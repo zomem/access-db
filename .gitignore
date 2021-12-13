@@ -11,3 +11,6 @@ OP.md
 .DS_Store
 
 .env
+
+test/data/
+fastdb/

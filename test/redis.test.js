@@ -1,145 +1,123 @@
 require('dotenv').config()
 const {redis} = require('../lib/index')
+const DATA = require('./data/redis.json')
+const PARAMS = require('./data/redismany.json')
 
 
-test('redis set/get Sting test: ', async () => {
+jest.setTimeout(50000)
+test('redis: ', async () => {
   
-  return
+  /** redis.set */ 
+  let id2 = ''
   
-  let rd = await redis.del(['title', 'a', 'b', 'c', 'num', 'user', 'user2', 'user3', 'user4', 'timePass'])
-  console.log('del@: ', rd.data)
-
-  console.time('redisSet')
-  const r1 = await redis.set('string', {
-    title: 'abc111',
-  })
-  console.timeEnd('redisSet')
-  expect(r1.data).toBe(1)
-  const r11 = await redis.set('string', {
-    title: 'abc888_by_notExist',
-    title2: 'title2'
-  })  //都不保存，如果其中有一个存在
-  expect(r11.data).toBe(0)
-
-
-  const rr = await redis.set('string', {
-    num: 3,
-  })
-  expect(rr.data).toBe(1)
-  const g0 = await redis.get('string', 'title')
-  expect(g0.data.title).toBe('abc111')
-  const g1 = await redis.get('string', ['title', 'num'])
-  expect(g1.data.title).toBe('abc111')
-  expect(g1.data.num).toBe('3')
-  
-
-  const r3 = await redis.set('string', {
-    user: {
-      nickname: 'wzj888',
-      age: 12888,
-    },
-  })
-  console.log('r3', r3)
-  expect(r3.data).toBe(1)
-
-  await redis.set('string', {
-    user2: {
-      nickname: 'zhao',
-      age: 23,
-    },
-  }, {seconds: 20})
-  await redis.set('string', {
-    user3: 'u3',
-    user4: 'user4'
-  }, {seconds: 15})
-
-  const r333 = await redis.set('string', {
-    timePass: 'atime'
-  }, {milliseconds: 5000})
-  expect(r333.data).toBe(1)
-
-  
-  const r4 = await redis.set('string', {
-    a: 'aa',
-    b: 323,
-    c: {
-      c1: 'c111',
-      c3: 43,
-      c2: {
-        c21: 'c2121',
-        c22: {
-          cc: 'cc'
-        }
-      }
+  for(let i = 0; i < DATA.length; i++){
+    let setRes0, setRes2
+    let tempId = DATA[i].params.id
+    let tempExpire = DATA[i]._expire
+    if(tempId){
+      setRes0 = await redis.set(DATA[i].table, DATA[i].params)
+      expect(setRes0.data.insertId).toEqual(`${tempId}`)
     }
-  })
-  expect(r4.data).toBe(1)
-  const get0 = await redis.get('string', ['a', 'b', 'c'], {expireSec: true})
-  console.log('get多个值： ', get0.data)
-  expect(get0.data.a).toEqual('aa')
-  expect(get0.data.expireSec.a).toEqual(-1)
-})
+    if(tempExpire){
+      setRes2 = await redis.set(DATA[i].table, DATA[i].params, tempExpire)
+      id2 = setRes2.data.insertId
+      expect(setRes2.data.insertId).toBeDefined()
+    }
+  }
 
-
-test('redis update string test', async () => {
-  return
   
-  await redis.del(['update_title', 'setStr', 'tim', 'tim2'])
+  /** redis.get */ 
+  let id0 = DATA[0].params.id
+  let getRes0 = await redis.get(DATA[0].table, id0)
+  expect(getRes0.data._expire).toBe(-1)
+  expect(getRes0.data.id).toEqual(`${DATA[0].params.id}`)
+  expect(getRes0.data.weight).toEqual(`${DATA[0].params.weight}`)
 
-  /** set */
-  await redis.set('string', {
-    setStr: 'str'
+  let getRes2 = await redis.get(DATA[2].table, id2)
+  expect(getRes2.data._expire).toBeGreaterThan(DATA[2]._expire - 2000)
+
+  /*** redis.update  */
+  await redis.update(DATA[2].table, id2, {
+    nickname: '用户昵称',
+    like: 'abc',
   })
-  await redis.update('string', {
-    setStr: 'str2'
+  getRes2 = await redis.get(DATA[2].table, id2)
+  expect(getRes2.data.like).toEqual('abc')
+  expect(getRes2.data.nickname).toEqual('用户昵称')
+
+  await redis.update(DATA[2].table, id0, {
+    like: 666,
+  }, 50000)
+  getRes0 = await redis.get(DATA[2].table, id0)
+  expect(getRes0.data.like).toEqual('666')
+  expect(getRes0.data._expire).toBeGreaterThan(50000 - 2000)
+
+  await redis.update(DATA[2].table, id0, {
+    like: ['incr', 100],
+    weight: ['incr', -30.2]
   })
-  let rb2 = await redis.get('string', 'setStr')
-  expect(rb2.data.setStr).toBe('str2')
+  getRes0 = await redis.get(DATA[2].table, id0)
+  expect(getRes0.data.like).toEqual('766')
+  expect(parseFloat(getRes0.data.weight).toFixed(1)).toEqual('15.6')
 
-
-  /** add */
-  let r8 = await redis.update('string', {
-    update_title: 'one',
+  await redis.update(DATA[2].table, id0, {
+    avatar_url: ['unset']
   })
-  let ra = await redis.update('string', {
-    update_title: ['add', ' !!!']
+  getRes0 = await redis.get(DATA[2].table, id0)
+  expect(getRes0.data.avatar_url).toBeUndefined()
+
+
+  /** redis.find count */
+  console.time('redis.find')
+  let findRes = await redis.find(DATA[0].table, {
+    p0: ['weight', '>', 40],
+    r: 'p0',
+    limit: 4, 
+    page: 1
   })
-  // one !!!
-  expect(ra.data).toBe(7)
-  let rb = await redis.get('string', ['update_title'])
-  expect(rb.data.update_title).toBe('one !!!')
-
-  let tim = await redis.set('string', {
-    tim: 'abc'
-  }, {expireSec: 100})
-  console.log('set一个过期时间为100s的key ：', tim)
-  let v = await redis.get('string', 'tim')
-  console.log('值： ', v)
-  let t = await redis.get('string', 'tim', {expireSec: true})
-  console.log('过期时间： ', t)
-  await redis.update('string', {
-    tim: ['expireSec', 200]
+  console.timeEnd('redis.find')
+  let num0 = await redis.count(DATA[0].table, {
+    p0: ['weight', '>', 40],
+    r: 'p0',
   })
-  let t1 = await redis.get('string', 'tim', {expireSec: true})
-  console.log('更新后的过期时间： ', t1)
+  console.log('redis find ', findRes.data.objects)
+  let num = (await redis.count(DATA[0].table)).data
+  console.log('redis count', num, num0)
+
+  await redis.del(DATA[0].table, id0)
+  await redis.delmany(DATA[0].table, [DATA[1].params.id, id2])
 
 
+  /** redis.setmany */
+  await redis.setmany('books', PARAMS)
+  let findManyRes = await redis.find('books')
+  
+  let datat = findManyRes.data.objects, allids = []
+  for(let i = 0; i < datat.length; i++){
+    allids.push(datat[i].id)
+  }
 
-  let tim2 = await redis.set('string', {
-    tim2: 'abc66'
-  }, {expireSec: 90})
-  console.log('set一个过期时间为122000ms的key ：', tim2)
-  let v2 = await redis.get('string', 'tim2')
-  console.log('值2： ', v2)
-  let t2 = await redis.get('string', 'tim2', {expireMillisec: true})
-  console.log('过期时间2： ', t2)
-  let tm = await redis.update('string', {
-    tim2: ['expireAt', 1626966468]
+  
+  findManyRes = await redis.find('books', {
+    p0: ['weight', '<', '2231.567'],
+    p1: ['weight', '>', 100],
+    p2: ['nickname', 'in', ['下哦哦4']],
+    r: 'p0 && p1 && p2',
+    orderBy: ['-weight']
   })
-  console.log('更新时间2', tm)
-  let t12 = await redis.get('string', 'tim2', {expireSec: true})
-  console.log('更新后的过期时间2： ', t12)
+  
+  expect((await redis.count('books', {
+    p0: ['weight', '<', '2231.567'],
+    p1: ['weight', '>', 100],
+    p2: ['nickname', 'in', ['下哦哦4']],
+    r: 'p0 && p1 && p2',
+  })).data).toBe(26)
 
-
+  let num2 = (await redis.count('books')).data
+  console.log('redis many count: ', num2)
+  expect(num2).toBe(13200)
+  
+  await redis.delmany('books', allids)
+  await redis.delmany('users', [4, 5, 6, 7])
 
 })

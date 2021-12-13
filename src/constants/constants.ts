@@ -19,7 +19,7 @@ export const PLATFORM_NAME = {
 //更新数据的方法
 export const MONGODB_UPDATE_METHORD = ['incr', 'set', 'unset', 'geo', 'append', 'remove', 'uAppend']
 export const MYSQL_UPDATE_METHORD = ['incr', 'set', 'unset']
-export const REDIS_UPDATE_METHORD = ['incr', 'add', 'set', 'unset', 'range', 'expireSec', 'expireMillisec', 'expireAt', 'expireMilliAt']
+export const REDIS_UPDATE_METHORD = ['incr', 'set', 'unset']
 export const FASTDB_UPDATE_METHORD = ['incr', 'set', 'unset', 'geo', 'append', 'remove', 'uAppend']
 
 
@@ -32,7 +32,3 @@ export const J_MAX = 6   // j*  参数的最大少于个数
 export const J_NAME_LIST = ['j0', 'j1', 'j2', 'j3', 'j4', 'j5']
 
 
-// redis 
-export const REDIS_STRUCTURE = {
-  string: 'string'
-}

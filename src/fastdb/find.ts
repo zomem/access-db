@@ -3,45 +3,77 @@ import {FastdbCheckParams, FastdbFindRes} from '../index'
 import { PLATFORM_NAME } from '../constants/constants'
 import {FASTDB_FILE_ERROR} from '../constants/error'
 import findTrans from '../utils/findTrans'
+import {fastdbSort} from '../utils/utils'
 
 const fs = require('fs')
 const POSITION_STEP = 9
 
 function fetchFind(table: string, params: FastdbCheckParams = {}): FastdbFindRes {
+
   const filePath = pathTo(table)
-  let oldBuf, result: any[] = []
+  let oldBuf, result: any[] = [], newarr: any[] = []
   if (!fs.existsSync(filePath)) {
     throw new Error(FASTDB_FILE_ERROR)
   }
 
   oldBuf = fs.readFileSync(filePath)
-  // let os = oldBuf.indexOf(`{"_fid":`)
-  // let oe = oldBuf.indexOf(`,{"_fid"`)
-  // if(oe === -1) oe = oldBuf.length - 1
-  // let offset = oe - os
 
-
-  let t_positon=POSITION_STEP, t_json, n=0
   let limit = (params.limit || 20)
   let all = limit * (params.page || 1)
-
-  while (result.length < all && t_positon < oldBuf.length) { 
-    let start = oldBuf.lastIndexOf(`{"_fid":`, t_positon)
-    let end = oldBuf.indexOf(`,{"_fid"`, t_positon)
-    if(end === -1){
-      end = oldBuf.length - 1
+  let t_positon=POSITION_STEP, t_json, n=0
+  
+  
+  if(params.orderBy){
+    let all_json = JSON.parse(oldBuf.toString())
+    if(params.orderBy[0][0] === '-'){
+      newarr = fastdbSort(all_json, params.orderBy[0].substr(1), 0)
+    }else{
+      newarr = fastdbSort(all_json, params.orderBy[0], 1)
     }
-    if(start > -1){
-      t_json = JSON.parse(oldBuf.slice(start, end).toString())
+    let index: number = 0
+    while (result.length < all && index < newarr.length) { 
+      t_json = newarr[index]
+      let isOk = findTrans(params, 1, t_json, PLATFORM_NAME.FASTDB)
+      if(isOk){
+        result.push(t_json)
+      }
+      index++
     }
-    let isOk = findTrans(params, 1, t_json, PLATFORM_NAME.FASTDB)
-    if(isOk){
-      result.push(t_json)
+    result = result.slice(-limit)
+  }else{
+    while (result.length < all && t_positon < oldBuf.length) { 
+      let start = oldBuf.lastIndexOf(`{"id":`, t_positon)
+      let end = oldBuf.indexOf(`,{"id"`, t_positon)
+      if(end === -1){
+        end = oldBuf.length - 1
+      }
+      if(start > -1){
+        t_json = JSON.parse(oldBuf.slice(start, end).toString())
+      }
+      let isOk = findTrans(params, 1, t_json, PLATFORM_NAME.FASTDB)
+      if(isOk){
+        result.push(t_json)
+      }
+      t_positon = end + POSITION_STEP
     }
-    t_positon = end + POSITION_STEP
+    result = result.slice(-limit)
   }
 
-  return {data: {objects: result.slice(-limit)}}
+  // let tempAdd: any[] = []
+  // if(params.select){
+  //   for(let i = 0; i < result.length; i++){
+  //     let o = {}
+  //     for(let j = 0; j < params.select.length; j++){
+  //       if(params.select[j][0] === '-'){
+  //         delete result[i][params.select[j].substr(1)]
+  //       }else{
+  //         o[result[i][params.select[j]]]
+  //       }
+  //     }
+  //   }
+  // }
+
+  return {data: {objects: result}}
 }
 
 

@@ -1,26 +1,27 @@
-#### 简单中文  
-  
+### 统一各类数据库的连接    
 [access-db文档](https://access-db.cn)  
-## 统一各类数据库的连接    
+#### 使用示例：  
+```js 
+import {mysql, mongodb, redis, fastdb} from 'access-db'
 
-目前支持的数据库有：  
+async function exp() {
+  fastdb.set('city', {id: 1, name: 'one'})
+  await mysql.find('tableName2', {
+    p0: ['num', '=', (await mongodb.get('tableName1', id)).data.num],
+    r: 'p0'
+  })
+  await redis.set('tableName2', {
+    id: 2,
+    num: 12
+  }, 3000)
+}
+```
+  
+#### 安装  
+> npm install access-db dotenv   
 
-| 数据库  | 说明                                          | 支持版本 |
-| ------- | --------------------------------------------- | :------- |
-| FastDB  | 本地json文件数据库<br />\[由access_db团队开发\]  | 0.0.6    |
-| MongoDB | 分布式文件存储数据库                          | 4.x      |
-| Mysql   | 关系型数据库                                  | 8.x, 5.x |
-| redis   | 高性能的 key-value 数据库                     | 6.x, 5.x |
-
-
-
-1. 安装  
-> npm install access-db  
-> yarn add access-db  
-
-2. 在项目根目录新建`.env`文件，然后填写配置信息  
-> yarn add dotenv  
-然后在项目最开始，尽可能早的引入`require('dotenv').config()`  
+#### 在项目根目录新建`.env`文件，然后填写配置信息   
+然后在项目最开始，尽可能早的引入`require('dotenv').config()`，详情可以查看dotenv的使用  
 `.env`配置如下  
   
 > MYSQL_HOST  MONGODB_HOST  REDIS_HOST  FASTDB_DIR
@@ -45,6 +46,9 @@
   MONGODB_PORT=
 
   REDIS_HOST=localhost    // 非必填，不填则表示不使用该数据库
+  REDIS_USER=
+  REDIS_PASSWORD=
+  REDIS_DATABASE=
   REDIS_PORT=
 
 
@@ -54,42 +58,50 @@
 ```
 
 
-3. 使用：  
+**关于fastdb说明**
+
+1. 数据库为json文件
+2. 每条数据以对象的形式保存，然后一起组成数组
+3. json里没有**换行**和**空格**符号，当前字段的值是可以包含这些的。
+4. **每条数据最前面**都有唯一标识`"id":"xxx"`（新增(fastdb.set)数据时，会自动生成或调整）  
+  
+  
+   
+目前支持的数据库有：  
+
+| 数据库  | 说明                                          | 支持版本 |
+| ------- | --------------------------------------------- | :------- |
+| FastDB  | 本地json文件数据库<br />\[由access_db团队开发\]  | 0.1.0    |
+| MongoDB | 分布式文件存储数据库                          | 4.x      |
+| Mysql   | 关系型数据库                                  | 8.x, 5.x |
+| Redis   | 高性能的 key-value 数据库                     | 6.x, 5.x |
+  
+  
+
+  
+### Unified access to all kinds of databases     
+[access-db文档](https://access-db.cn)   
+#### use:   
 ```js 
-import {mysql, mongodb} from 'access-db'
+import {mysql, mongodb, redis, fastdb} from 'access-db'
 
 async function exp() {
-  let {data} = await mongodb.get('tableName1', id)
+  fastdb.set('city', {id: 1, name: 'one'})
   await mysql.find('tableName2', {
-    p0: ['num', '=', data.num],
+    p0: ['num', '=', (await mongodb.get('tableName1', id)).data.num],
     r: 'p0'
   })
+  await redis.set('tableName2', {
+    id: 2,
+    num: 12
+  }, 3000)
 }
 ```
 
-
-#### English
-
-[access-db doc](https://access-db.cn)  
-## Unified access to all kinds of databases    
-
-At present, the supported databases are as follows:   
-
-| database | introduction                                                 | supported version |
-| -------- | ------------------------------------------------------------ | :---------------- |
-| FastDB   | Local JSON file database<br /> \[by access_ DB team development\] | 0.0.6             |
-| MongoDB  | Distributed file storage database                            | 4.x               |
-| Mysql    | Relational database                                          | 8.x, 5.x          |
-| redis    | High performance key value database                          | 6.x, 5.x          |
-
-
-
-1. install  
-> npm install access-db   
-> yarn add access-db   
-
-2. Create a new `.env` file in the project root directory, and then fill in the configuration information   
-> yarn add dotenv  
+#### install  
+> npm install access-db dotenv    
+   
+#### Create a new `.env` file in the project root directory, and then fill in the configuration information  
 Then introduce `require('dotenv').config()` as early as possible at the beginning of the project   
 `.env` is configured as follows  
   
@@ -114,25 +126,25 @@ Then introduce `require('dotenv').config()` as early as possible at the beginnin
   MONGODB_PORT=
   
   REDIS_HOST=localhost    // not need，if it's undefined, the db will not be used
+  REDIS_USER=
+  REDIS_PASSWORD=
+  REDIS_DATABASE=
   REDIS_PORT=
 
   FASTDB_DIR=   // the dir of fastdb. default is project's root
 ```
 
+  
+At present, the supported databases are as follows:    
+ 
+| database | introduction                                                 | supported version |
+| -------- | ------------------------------------------------------------ | :---------------- |
+| FastDB   | Local JSON file database<br /> \[by access_ DB team development\] | 0.1.0        |
+| MongoDB  | Distributed file storage database                            | 4.x               |
+| Mysql    | Relational database                                          | 8.x, 5.x          |
+| Redis    | High performance key value database                          | 6.x, 5.x          |
 
-1. use:   
-```js 
-import {mysql, mongodb} from 'access-db'
-
-async function exp() {
-  let {data} = await mongodb.get('tableName1', id)
-  await mysql.find('tableName2', {
-    p0: ['num', '=', data.num],
-    r: 'p0'
-  })
-}
-```
-
+  
 
 
 

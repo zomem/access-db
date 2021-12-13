@@ -17,17 +17,17 @@ function fetchUpdate(table: string, id: string | number, params: FastdbUpdatePar
   if(!id){
     throw new Error(FASTDB_GET_ID_ERROR)
   }
-  if(params.id || params._fid){
+  if(params.id){
     throw new Error(FASTDB_UPDATE_ID_ERROR)
   }
 
   oldBuf = fs.readFileSync(filePath)
-  start = isNumber(id) ? oldBuf.indexOf(`{"_fid":${id}`) : oldBuf.indexOf(`{"_fid":"${id}"`)
+  start = isNumber(id) ? oldBuf.indexOf(`{"id":${id}`) : oldBuf.indexOf(`{"id":"${id}"`)
   if(start === -1){
     // 没有
     result = {}
   }else{
-    end = oldBuf.indexOf(`,{"_fid"`, start + 8)
+    end = oldBuf.indexOf(`,{"id"`, start + 8)
     if(end === -1){
       // 没有
       end = oldBuf.length - 1

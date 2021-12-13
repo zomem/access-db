@@ -1,4 +1,4 @@
-import {FastdbParams, FastdbSetRes} from '../index'
+import {FastdbSetParams, FastdbSetRes} from '../index'
 import {pathTo, mkdir} from '../utils/pathTo'
 import {strHash} from '../utils/timeHash'
 import {FASTDB_HAVE_ID_ERROR} from '../constants/error'
@@ -6,44 +6,42 @@ import {isNumber, changeSetParams} from '../utils/utils'
 
 const fs = require('fs')
 
-function fetchSet(table: string, params: FastdbParams={}): FastdbSetRes {
+function fetchSet(table: string, params: FastdbSetParams={}): FastdbSetRes {
   const filePath = pathTo(table)
-  let oldBuf
+  let oldBuf, tempParams = {...params}
   if (!fs.existsSync(filePath)) {
     mkdir(filePath, '[]')
   }
-  let rid = strHash()
-  if(!params.id){
-    delete params._fid
-    params = {
-      _fid: rid,
-      id: rid,
-      ...params
+  if(!tempParams.id){
+    tempParams = {
+      id: strHash(),
+      ...tempParams
     }
   }else{
-    delete params._fid
-    params = {
-      _fid: params.id,
-      ...params
+    const tempid = tempParams.id
+    delete tempParams.id
+    tempParams = {
+      id: tempid,
+      ...tempParams
     }
   }
   oldBuf = fs.readFileSync(filePath)
-  if(isNumber(params._fid)){
-    if(oldBuf.includes(`"_fid":${params._fid}`)){
-      throw new Error(FASTDB_HAVE_ID_ERROR + ': ' + params._fid)
+  if(isNumber(tempParams.id)){
+    if(oldBuf.includes(`"id":${tempParams.id}`)){
+      throw new Error(FASTDB_HAVE_ID_ERROR + ': ' + tempParams.id)
     }
   }else{
-    if(oldBuf.includes(`"_fid":"${params._fid}"`)){
-      throw new Error(FASTDB_HAVE_ID_ERROR + ': ' + params._fid)
+    if(oldBuf.includes(`"id":"${tempParams.id}"`)){
+      throw new Error(FASTDB_HAVE_ID_ERROR + ': ' + tempParams.id)
     }
   }
   
   let offset = oldBuf.length - 1
-  let nowBuf = Buffer.from((oldBuf.length === 2 ? '' : ',') + JSON.stringify(changeSetParams(params)) + ']')
+  let nowBuf = Buffer.from((oldBuf.length === 2 ? '' : ',') + JSON.stringify(changeSetParams(tempParams)) + ']')
   let tempBuf = Buffer.concat([oldBuf, Buffer.allocUnsafe(nowBuf.length-1)])
   let addBuf = tempBuf.fill(nowBuf, offset)
   fs.writeFileSync(filePath, addBuf)
-  return {data: {insertId: params.id as string | number}}
+  return {data: {insertId: tempParams.id as string | number}}
 }
 
 

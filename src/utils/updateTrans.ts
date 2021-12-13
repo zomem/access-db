@@ -1,12 +1,12 @@
+import { hrtime } from 'process'
 import {
   PLATFORM_NAME, 
   MONGODB_UPDATE_METHORD,
   MYSQL_UPDATE_METHORD, 
   REDIS_UPDATE_METHORD,
-  FASTDB_UPDATE_METHORD,
-  REDIS_STRUCTURE
+  FASTDB_UPDATE_METHORD
 } from '../constants/constants'
-import {UPDATE_ERROR, REDIS_DATA_TYPE_ERROR, REDIS_TYPE_NOMETHOD_ERROR, FASTDB_UPDATE_JSON_ERROR} from '../constants/error'
+import {UPDATE_ERROR, FASTDB_UPDATE_JSON_ERROR} from '../constants/error'
 import {cloneDeep, isArray, isJson, changeSqlParam} from './utils'
 
 
@@ -123,114 +123,66 @@ export default function updateTrans<T>(params: T, query, dbType){
 
   //redis
   if(dbType === PLATFORM_NAME.REDIS){
-    let keyValue:any = [], key:any = [], method: string = 'set'
+    let [table, id] = query, keyData: any = []
+    keyData.push({
+      method: 'SETNX',
+      key: table + ':id:key:' + id,
+      value: `${new Date().getTime()}${hrtime.bigint()}`  //更新更新时间
+    })
     for(let pa in params){
-      let tempValue: any = ''
+      if(pa === 'id') continue
       if(!isArray(params[pa])){
-        switch(query.structure){
-          case REDIS_STRUCTURE.string:
-            if(isJson(params[pa])){
-              tempValue = JSON.stringify(params[pa])
-            }else{
-              tempValue = params[pa]
-            }
-            key.push(pa)
-            keyValue.push(pa)
-            keyValue.push(tempValue)
-            method = 'set'
-            break
-          default:
-            throw new Error(REDIS_DATA_TYPE_ERROR)
-        }
-        continue
-      }
-
-      if(REDIS_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
-        tempValue = params[pa][1]
-        switch(query.structure){
-          case REDIS_STRUCTURE.string:
-            switch(params[pa][0]){
-              case 'set':
-                if(isJson(params[pa])){
-                  tempValue = JSON.stringify(tempValue)
-                }else{
-                  tempValue = tempValue
-                }
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(tempValue)
-                method = 'set'
-                break
-              case 'incr':
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(tempValue)
-                method = 'incrby'
-                break
-              case 'add':
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(tempValue)
-                method = 'append'
-                break
-              case 'range':
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(params[pa][2] || 0) //offset 没有则为0
-                keyValue.push(tempValue)
-                method = 'setrange'
-                break
-              case 'expireSec':
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(tempValue)
-                method = 'expire'
-                break
-              case 'expireMillisec':
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(tempValue)
-                method = 'pexpire'
-                break
-              case 'expireAt':
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(tempValue)
-                method = 'expireat'
-                break
-              case 'expireMilliAt':
-                key.push(pa)
-                keyValue.push(pa)
-                keyValue.push(tempValue)
-                method = 'pexpireat'
-                break
-              default:
-                throw new Error(query.structure + REDIS_TYPE_NOMETHOD_ERROR + params[pa][0])
-            }
-            break
-          default:
-            throw new Error(REDIS_DATA_TYPE_ERROR)
-        }
+        keyData.push({
+          method: 'HSET',
+          key: table + ':' + id,
+          value: [pa, `${params[pa]}`]
+        })
       }else{
-        // 当没有给定的方法时，使用默认set
-        switch(query.structure){
-          case REDIS_STRUCTURE.string:
-            if(isJson(params[pa])){
-              tempValue = JSON.stringify(params[pa])
-            }else{
-              tempValue = params[pa]
-            }
-            key.push(pa)
-            keyValue.push(pa)
-            keyValue.push(tempValue)
-            method = 'set'
-            break
-          default:
-            throw new Error(REDIS_DATA_TYPE_ERROR)
+        if(REDIS_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
+          switch(params[pa][0]){
+            case 'set':
+              keyData.push({
+                method: 'HSET',
+                key: table + ':' + id,
+                value: [pa, `${params[pa][1]}`]
+              })
+              break
+            case 'unset':
+              keyData.push({
+                method: 'HDEL',
+                key: table + ':' + id,
+                value: pa
+              })
+              break
+            case 'incr':
+              if(params[pa][1].toString().indexOf('.') > -1){
+                keyData.push({
+                  method: 'HINCRBYFLOAT',
+                  key: table + ':' + id,
+                  value: [pa, params[pa][1]]
+                })
+              }else{
+                keyData.push({
+                  method: 'HINCRBY',
+                  key: table + ':' + id,
+                  value: [pa, params[pa][1]]
+                })
+              }
+              break
+            default:
+              throw new Error(UPDATE_ERROR)
+          }
+        }else{
+          //直接 set
+          keyData.push({
+            method: 'HSET',
+            key: table + ':' + id,
+            value: [pa, `${params[pa]}`]
+          })
         }
       }
     }
-    result = {keyValue, key, method}
+    result = keyData
   }
 
 

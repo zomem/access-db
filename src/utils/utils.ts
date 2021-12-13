@@ -130,3 +130,281 @@ export const changeSqlParam = (param: any) => {
 }
 
 
+// 快速排序，推荐，用于redis默认排序,默认的存入的时间先后
+export const stringTimeNumSort = (arr, list) => {
+  function main(arr, left, right, list) {
+    if(arr.length === 1) {
+      return
+    }
+    let index = partition(arr, left, right, list)
+    if(left < index - 1) {
+      main(arr, left, index - 1, list)
+    }
+    if(index < right) {
+      main(arr, index, right, list)
+    }
+  }
+  function partition(arr, left, right, list) {
+    let pivot = arr[Math.floor((left + right) / 2)]
+    while(left <= right) {
+      while(arr[left] > pivot) {
+        left++
+      }
+      while(arr[right] < pivot) {
+        right--
+      }
+      if(left <= right) {
+        let temp = arr[right]
+        arr[right] = arr[left]
+        arr[left] = temp
+        temp = list[right]
+        list[right] = list[left]
+        list[left] = temp
+        left++
+        right--
+      }
+    }
+    return left
+  }
+
+  let left = 0, right = arr.length - 1
+  main(arr, left, right, list)
+  return list
+  
+}
+
+
+// 按数组对象的值,数字，降序排列，用于redis
+export const RedisSortNum = (arr, key, isUp=1) => {
+  if(isUp === 1){
+    function main(arr, left, right) {
+      if(arr.length === 1) {
+        return
+      }
+      let index = partition(arr, left, right)
+      if(left < index - 1) {
+        main(arr, left, index - 1)
+      }
+      if(index < right) {
+        main(arr, index, right)
+      }
+    }
+    function partition(arr, left, right) {
+      let pivot = +(arr[Math.floor((left + right) / 2)][key] || 0)
+      while(left <= right) {
+        while(+(arr[left][key] || 0) < pivot) {
+          left++
+        }
+        while(+(arr[right][key] || 0) > pivot) {
+          right--
+        }
+        if(left <= right) {
+          let temp = arr[right]
+          arr[right] = arr[left]
+          arr[left] = temp
+          left++
+          right--
+        }
+      }
+      return left
+    }
+  
+    let left = 0, right = arr.length - 1
+    main(arr, left, right)
+    return arr
+
+  }else{
+    function main(arr, left, right) {
+      if(arr.length === 1) {
+        return
+      }
+      let index = partition(arr, left, right)
+      if(left < index - 1) {
+        main(arr, left, index - 1)
+      }
+      if(index < right) {
+        main(arr, index, right)
+      }
+    }
+    function partition(arr, left, right) {
+      let pivot = +(arr[Math.floor((left + right) / 2)][key] || 0)
+      while(left <= right) {
+        while(+(arr[left][key] || 0) > pivot) {
+          left++
+        }
+        while(+(arr[right][key] || 0) < pivot) {
+          right--
+        }
+        if(left <= right) {
+          let temp = arr[right]
+          arr[right] = arr[left]
+          arr[left] = temp
+          left++
+          right--
+        }
+      }
+      return left
+    }
+  
+    let left = 0, right = arr.length - 1
+    main(arr, left, right)
+    return arr
+
+  }
+}
+
+// 按数组对象的值，降序排列，用于redis
+export const RedisSortStr = (arr, key, isUp=1) => {
+  if(isUp === 1){
+    function main(arr, left, right) {
+      if(arr.length === 1) {
+        return
+      }
+      let index = partition(arr, left, right)
+      if(left < index - 1) {
+        main(arr, left, index - 1)
+      }
+      if(index < right) {
+        main(arr, index, right)
+      }
+    }
+    function partition(arr, left, right) {
+      let pivot = arr[Math.floor((left + right) / 2)][key]
+      while(left <= right) {
+        while(arr[left][key] < pivot) {
+          left++
+        }
+        while(arr[right][key] > pivot) {
+          right--
+        }
+        if(left <= right) {
+          let temp = arr[right]
+          arr[right] = arr[left]
+          arr[left] = temp
+          left++
+          right--
+        }
+      }
+      return left
+    }
+  
+    let left = 0, right = arr.length - 1
+    main(arr, left, right)
+    return arr
+
+  }else{
+    function main(arr, left, right) {
+      if(arr.length === 1) {
+        return
+      }
+      let index = partition(arr, left, right)
+      if(left < index - 1) {
+        main(arr, left, index - 1)
+      }
+      if(index < right) {
+        main(arr, index, right)
+      }
+    }
+    function partition(arr, left, right) {
+      let pivot = arr[Math.floor((left + right) / 2)][key]
+      while(left <= right) {
+        while(arr[left][key] > pivot) {
+          left++
+        }
+        while(arr[right][key] < pivot) {
+          right--
+        }
+        if(left <= right) {
+          let temp = arr[right]
+          arr[right] = arr[left]
+          arr[left] = temp
+          left++
+          right--
+        }
+      }
+      return left
+    }
+  
+    let left = 0, right = arr.length - 1
+    main(arr, left, right)
+    return arr
+
+  }
+}
+
+
+// 排序 find，fastdb
+export const fastdbSort = (arr, key, isUp=1) => {
+  if(isUp === 1){
+    function main(arr, left, right) {
+      if(arr.length === 1) {
+        return
+      }
+      let index = partition(arr, left, right)
+      if(left < index - 1) {
+        main(arr, left, index - 1)
+      }
+      if(index < right) {
+        main(arr, index, right)
+      }
+    }
+    function partition(arr, left, right) {
+      let pivot = arr[Math.floor((left + right) / 2)][key]
+      while(left <= right) {
+        while(arr[left][key] < pivot) {
+          left++
+        }
+        while(arr[right][key] > pivot) {
+          right--
+        }
+        if(left <= right) {
+          let temp = arr[right]
+          arr[right] = arr[left]
+          arr[left] = temp
+          left++
+          right--
+        }
+      }
+      return left
+    }
+  
+    let left = 0, right = arr.length - 1
+    main(arr, left, right)
+  }else{
+    function main(arr, left, right) {
+      if(arr.length === 1) {
+        return
+      }
+      let index = partition(arr, left, right)
+      if(left < index - 1) {
+        main(arr, left, index - 1)
+      }
+      if(index < right) {
+        main(arr, index, right)
+      }
+    }
+    function partition(arr, left, right) {
+      let pivot = arr[Math.floor((left + right) / 2)][key]
+      while(left <= right) {
+        while(arr[left][key] > pivot) {
+          left++
+        }
+        while(arr[right][key] < pivot) {
+          right--
+        }
+        if(left <= right) {
+          let temp = arr[right]
+          arr[right] = arr[left]
+          arr[left] = temp
+          left++
+          right--
+        }
+      }
+      return left
+    }
+  
+    let left = 0, right = arr.length - 1
+    main(arr, left, right)
+  }
+  return arr
+}

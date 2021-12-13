@@ -19,8 +19,8 @@ function fetchCount(table: string, params: FastdbCountParams = {}): CountRes {
   let t_positon=POSITION_STEP, t_json, n=0
 
   while (t_positon < oldBuf.length) { 
-    let start = oldBuf.lastIndexOf(`{"_fid":`, t_positon)
-    let end = oldBuf.indexOf(`,{"_fid"`, t_positon)
+    let start = oldBuf.lastIndexOf(`{"id":`, t_positon)
+    let end = oldBuf.indexOf(`,{"id"`, t_positon)
     if(end === -1){
       end = oldBuf.length - 1
     }

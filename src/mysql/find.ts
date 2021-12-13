@@ -237,7 +237,7 @@ function fetchFind(table: TTable, params: MysqlCheckParams = {}, query?: TSenten
       for(let i = 0; i < temp.length; i++){
         let tempG = temp[i], tempO
         if(tempG[0] === '-'){
-          tempO = tempG.replace('-', '').split('.')
+          tempO = tempG.substr(1).split('.')
           orderArr.push(`${tempO.length === 1 ? tempO[0] : tempO[1]} DESC`)
         }else{
           tempO = tempG.split('.')

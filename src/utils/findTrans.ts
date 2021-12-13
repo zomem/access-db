@@ -1,5 +1,5 @@
 import {PLATFORM_NAME, J_NAME_LIST} from '../constants/constants'
-import {FIND_CHECKR_ERROR, FIND_P_ERROR, FIND_P_BETWEEN_ERROR, FIND_NO_PJ_ERROR} from '../constants/error'
+import {FIND_CHECKR_ERROR, FIND_P_ERROR, FIND_P_BETWEEN_ERROR, FIND_NO_PJ_ERROR, PARAMS_NOT_ARR_ERROR, PARAMS_EMPTY_ARR_ERROR} from '../constants/error'
 import {changeFindGeoJson, isArray, changeSqlParam, isMongodbObjectId} from './utils'
 
 export default function findTrans<T>(params: T, r_num: number, query_data, dbType){
@@ -309,6 +309,8 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
           }
           break
         case 'in':
+          if(!isArray(tempParam)) throw new Error(PARAMS_NOT_ARR_ERROR)
+          if(tempParam.length === 0) throw new Error(PARAMS_EMPTY_ARR_ERROR)
           if(r_num === 2 && J_NAME_LIST.indexOf(fieldName) > -1){
             if(!params[fieldName]) throw new Error(FIND_NO_PJ_ERROR + fieldName)
             query[ps[i]] = `${query_data.jObj[fieldName]} IN ${tempParam}`
@@ -317,6 +319,8 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
           }
           break
         case 'notIn':
+          if(!isArray(tempParam)) throw new Error(PARAMS_NOT_ARR_ERROR)
+          if(tempParam.length === 0) throw new Error(PARAMS_EMPTY_ARR_ERROR)
           if(r_num === 2 && J_NAME_LIST.indexOf(fieldName) > -1){
             if(!params[fieldName]) throw new Error(FIND_NO_PJ_ERROR + fieldName)
             query[ps[i]] = `${query_data.jObj[fieldName]} NOT IN ${tempParam}`
@@ -506,6 +510,149 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
       }
     }
   }
+  //redis
+  if(dbType === PLATFORM_NAME.REDIS){
+    for(let i = 0; i < ps.length; i++){
+      query[ps[i]] = false  // 每一个p，是否通过
+      if(!params[ps[i]]) throw new Error(FIND_NO_PJ_ERROR + ps[i])
+      let qdata = query_data[params[ps[i]][0]]
+      let isNum = +qdata === NaN ? false : true
+      
+      switch(params[ps[i]][1]){
+        case '=':
+          if(isNum){
+            if(+qdata === +params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }else{
+            if(qdata === params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case '!=':
+          if(isNum){
+            if(+qdata != +params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }else{
+            if(qdata != params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case '<':
+          if(isNum){
+            if(+qdata < +params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }else{
+            if(qdata < params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case '<=':
+          if(isNum){
+            if(+qdata <= +params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }else{
+            if(qdata <= params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case '>':
+          if(isNum){
+            if(+qdata > +params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }else{
+            if(qdata > params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case '>=':
+          if(isNum){
+            if(+qdata >= +params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }else{
+            if(qdata >= params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case 'in':
+          let tempIn = qdata
+          if(isArray(tempIn)){
+            for(let a = 0; a < tempIn.length; a++){
+              if(params[ps[i]][2].indexOf(tempIn[a]) > -1){
+                query[ps[i]] = true
+                break
+              }
+            }
+          }else{
+            if(params[ps[i]][2].indexOf(tempIn) > -1){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case 'notIn':
+          let tempNotIn = qdata
+          if(isArray(tempNotIn)){
+            for(let b = 0; b < tempIn.length; b++){
+              if(!(params[ps[i]][2].indexOf(tempNotIn[b]) > -1)){
+                query[ps[i]] = true
+              }else{
+                query[ps[i]] = false
+                break
+              }
+            }
+          }else{
+            if(!(params[ps[i]][2].indexOf(tempNotIn) > -1)){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case 'regex':
+          if(params[ps[i]][2].test(qdata)){
+            query[ps[i]] = true
+          }
+          break
+        case 'strLength':
+          if(params[ps[i]].length > 3){
+            if(
+              (qdata.length >= params[ps[i]][2])
+              &&
+              (qdata.length <= params[ps[i]][3])
+            ){
+              query[ps[i]] = true
+            }
+          }else{
+            if(qdata.length === params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        case 'isExists':
+          if(qdata){
+            if(params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }else{
+            if(!params[ps[i]][2]){
+              query[ps[i]] = true
+            }
+          }
+          break
+        default:
+          throw new Error(FIND_P_ERROR)
+      }
+    }
+  }
 
 
   for(let i = 0; i < list.length; i++){
@@ -572,6 +719,27 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
         }
       }
 
+      // redis
+      if(dbType === PLATFORM_NAME.REDIS){
+        while(n < tempArr.length - 1){
+          if(tempArr[n+1] === '&&'){
+            if(tempQQ && query[tempArr[n+2]]){
+              tempQQ = true
+            }else{
+              tempQQ = false
+            }
+          }
+          if(tempArr[n+1] === '||'){
+            if(tempQQ || query[tempArr[n+2]]){
+              tempQQ = true
+            }else{
+              tempQQ = false
+            }
+          }
+          n += 2
+        }
+      }
+
       query[`pp${i}`] = tempQQ
       topBrackets = `pp${i}`
       stack.push(topBrackets)
@@ -618,6 +786,27 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
 
   // fastdb
   if(dbType === PLATFORM_NAME.FASTDB){
+    while(n < tempArr2.length - 1){
+      if(tempArr2[n+1] === '&&'){
+        if(QQ && query[tempArr2[n+2]]){
+          QQ = true
+        }else{
+          QQ = false
+        }
+      }
+      if(tempArr2[n+1] === '||'){
+        if(QQ || query[tempArr2[n+2]]){
+          QQ = true
+        }else{
+          QQ = false
+        }
+      }
+      n += 2
+    }
+  }
+
+  // redis
+  if(dbType === PLATFORM_NAME.REDIS){
     while(n < tempArr2.length - 1){
       if(tempArr2[n+1] === '&&'){
         if(QQ && query[tempArr2[n+2]]){

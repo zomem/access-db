@@ -24,23 +24,3 @@ await begin(async () => {
   }
 })
 
-
-
-
-/** redis set */
-mongodb.set('ttt', {})
-mysql.set('ttt', {},)
-redis.set('String', {
-  name: 'aaa'
-}, {whenExist: 0})
-
-redis.set('Hash', {
-  user: {
-    name: 'w',
-    token: 'kak'
-  }
-}, 50)
-
-redis.set('List', {
-  tags: ['aa', 'bb']
-}, 9)

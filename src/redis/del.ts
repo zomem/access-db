@@ -1,15 +1,16 @@
 
 import {redisClient} from '../utils/dbRedis'
-import {RedisDeleteRes} from '../index'
+import {RedisDeleteRes, TTable} from '../index'
 
-function fetchDel(keys: string | string[]): Promise<RedisDeleteRes>{
-  return new Promise((resolve, reject)=>{
-    redisClient.del(keys, async (err, reply) => {
-      if (err) {
-        reject({err})
-      }
-      resolve({data: reply})
-    })
+function fetchDel(table: TTable, id: number | string): Promise<RedisDeleteRes>{
+  return new Promise(async (resolve, reject)=>{
+    try{
+      let hkey: string = table + ':' + id, skey: string = table + ':id:key:' + id
+      const r = (await redisClient.DEL([hkey, skey])) as any
+      resolve({data: {deletedCount: r/2}})
+    }catch(err: any){
+      reject(err)
+    }
   })
 }
 

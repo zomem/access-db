@@ -9,7 +9,7 @@
 import {mysqlConnect} from '../utils/dbMysql'
 import {isArray} from '../utils/utils'
 import {TTable, MysqlSetParams, TSentence} from '../index'
-import {SET_MANY_PARAMS_ARR_ERROR} from '../constants/error'
+import {SET_MANY_PARAMS_ARR_ERROR, PARAMS_EMPTY_ARR_ERROR} from '../constants/error'
 import setTrans from '../utils/setTrans'
 import { PLATFORM_NAME } from '../constants/constants'
 
@@ -18,7 +18,7 @@ function fetchSetmany(table: TTable, params: MysqlSetParams[]): Promise<any>
 function fetchSetmany(table: TTable, params: MysqlSetParams[], query: TSentence): Promise<string>
 function fetchSetmany(table: TTable, params: MysqlSetParams[], query?: TSentence): Promise<any | string>{
   if(!isArray(params)) throw new Error(SET_MANY_PARAMS_ARR_ERROR)
-
+  if(params.length === 0) throw new Error(PARAMS_EMPTY_ARR_ERROR)
   return new Promise((resolve, reject)=>{
     let fields = []
     let values = []

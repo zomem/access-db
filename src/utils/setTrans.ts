@@ -1,6 +1,8 @@
-import {PLATFORM_NAME, REDIS_STRUCTURE} from '../constants/constants'
-import { UPDATE_ERROR, REDIS_DATA_TYPE_ERROR } from '../constants/error'
-import { isArray, isJson, changeSqlParam } from './utils'
+import { hrtime } from 'process'
+import {PLATFORM_NAME} from '../constants/constants'
+import { UPDATE_ERROR } from '../constants/error'
+import { isArray, isNumber, changeSqlParam } from './utils'
+import {strHash} from '../utils/timeHash'
 
 
 export default function setTrans<T>(params: T, query, dbType){
@@ -50,31 +52,33 @@ export default function setTrans<T>(params: T, query, dbType){
   }
 
   if(dbType === PLATFORM_NAME.REDIS){
-    let keyValue:any = [], key:any = [], method: string = 'set', ni = 0
-    for(let pa in params){
-      let tempValue: any = ''
-      switch(query.structure){
-        case REDIS_STRUCTURE.string:
-          if(isJson(params[pa])){
-            tempValue = JSON.stringify(params[pa])
-          }else{
-            tempValue = params[pa]
-          }
-          key.push(pa)
-          keyValue.push(pa)
-          keyValue.push(tempValue)
-          if(ni > 0){
-            method = 'msetnx'
-          }else{
-            method = 'setnx'
-          }
-          ni++
-          break
-        default:
-          throw new Error(REDIS_DATA_TYPE_ERROR)
+    let table = query, keyData: any = [], tempParams = {...params} as any
+    if(!tempParams.id){
+      tempParams = {
+        id: strHash(),
+        ...tempParams
+      }
+    }else{
+      const tempid = tempParams.id
+      delete tempParams.id
+      tempParams = {
+        id: tempid,
+        ...tempParams
       }
     }
-    result = {keyValue, key, method}
+    for(let p in tempParams){
+      keyData.push({
+        method: 'SETNX',
+        key: table + ':id:key:' + tempParams.id,
+        value: `${new Date().getTime()}${hrtime.bigint()}`  //保存更新时间
+      })
+      keyData.push({
+        method: 'HSETNX',
+        key: table + ':' + tempParams.id,
+        value: [p, `${tempParams[p]}`]
+      })
+    }
+    result = keyData
   }
   
   return result

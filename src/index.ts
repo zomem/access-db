@@ -56,6 +56,9 @@ export type TMysqlCheckMethod = '=' | '!=' | '<' | '<=' | '>' | '>=' |
 export type TFastdbCheckMethod = '=' | '!=' | '<' | '<=' | '>' | '>=' |
 'in' | 'notIn' | 'arrContain' | 'regex' | 'strLength' | 'isExists'
 
+export type TRedisCheckMethod = '=' | '!=' | '<' | '<=' | '>' | '>=' |
+'in' | 'notIn' | 'regex' | 'strLength' | 'isExists'
+
 //j方法，mysql的join 聚合等
 export type TMysqlJiaMethod = 'uniqueTable' | 'tableOf' | 'inner' | 'left' | 'right' | 'full' | 'count' | 
 'sum' | 'max' | 'min' | 'avg' | 'ucase' | 'lcase' |
@@ -152,6 +155,30 @@ interface FastdbPRList {
   r?: string
 }
 
+interface RedisPRList {
+  p0?: [string, TRedisCheckMethod, ...any[]]
+  p1?: [string, TRedisCheckMethod, ...any[]]
+  p2?: [string, TRedisCheckMethod, ...any[]]
+  p3?: [string, TRedisCheckMethod, ...any[]]
+  p4?: [string, TRedisCheckMethod, ...any[]]
+  p5?: [string, TRedisCheckMethod, ...any[]]
+  p6?: [string, TRedisCheckMethod, ...any[]]
+  p7?: [string, TRedisCheckMethod, ...any[]]
+  p8?: [string, TRedisCheckMethod, ...any[]]
+  p9?: [string, TRedisCheckMethod, ...any[]]
+  p10?: [string, TRedisCheckMethod, ...any[]]
+  p11?: [string, TRedisCheckMethod, ...any[]]
+  p12?: [string, TRedisCheckMethod, ...any[]]
+  p13?: [string, TRedisCheckMethod, ...any[]]
+  p14?: [string, TRedisCheckMethod, ...any[]]
+  p15?: [string, TRedisCheckMethod, ...any[]]
+  p16?: [string, TRedisCheckMethod, ...any[]]
+  p17?: [string, TRedisCheckMethod, ...any[]]
+  p18?: [string, TRedisCheckMethod, ...any[]]
+  p19?: [string, TRedisCheckMethod, ...any[]]
+  r?: string
+}
+
 export interface MongodbCheckParams extends MongodbPRList {
   page?: number
   limit?: number
@@ -166,9 +193,16 @@ export interface MysqlCheckParams extends MysqlPRList {
   select?: string[] | TJ[]
   groupBy?: string[]
 }
+export interface RedisCheckParams extends RedisPRList {
+  page?: number
+  limit?: number
+  orderBy?: string[]
+}
 export interface FastdbCheckParams extends FastdbPRList {
   page?: number
   limit?: number
+  orderBy?: string[]
+  // select?: string[]
 }
 
 
@@ -179,7 +213,10 @@ export interface MongodbCountParams extends MongodbPRList {
   limit?: 1
 }
 export interface FastdbCountParams extends FastdbPRList {
-  limit?: 1
+  
+}
+export interface RedisCountParams extends RedisPRList {
+  
 }
 export interface CountRes {
   data: number
@@ -188,7 +225,7 @@ export interface CountRes {
 type TMongodbUpdateMethod = 'incr' | 'set' | 'unset' | 'geo' | 'append' | 'remove' | 'uAppend'
 type TMysqlUpdateMethod = 'incr' | 'set' | 'unset'
 type TFastdbUpdateMethod = 'incr' | 'set' | 'unset' | 'geo' | 'append' | 'remove' | 'uAppend'
-type TRedisUpdateMethod = 'incr' | 'add' | 'set' | 'range' | 'endSec' | 'endMillisec' | 'endTime' | 'endMilliTime'
+type TRedisUpdateMethod = 'incr' | 'set' | 'unset'
 type dataType = string | string[] | number | number[] | boolean | boolean[] | null | undefined | {
   [propName: string] : any
 } | {
@@ -219,9 +256,6 @@ export interface MongodbUpdateKey{
 export interface RedisUpdateParams {
   [key: string]: [TRedisUpdateMethod, dataType] | dataType
 }
-export interface RedisStringUpdateParams {
-  [key: string]: ['incr' | 'add' | 'set' | 'range' | 'expireSec' | 'expireMillisec' | 'expireAt' | 'expireMilliAt', dataType] | dataType
-}
 export interface FastdbUpdateParams {
   [key: string]: [TFastdbUpdateMethod, dataType] | dataType
 }
@@ -234,13 +268,11 @@ export interface MongodbSetParams {
 export interface MysqlSetParams {
   [key: string]: dataType
 }
-export interface RedisSetQuery {
-  expireSec?: number
-  expireMillisec?: number
-  expireAt?: number
-  expireMilliAt?: number
+export interface RedisSetParams {
+  [key: string]: number | string
 }
-export interface FastdbParams {
+
+export interface FastdbSetParams {
   [key: string]: ['geo', dataType] | dataType
 }
 
@@ -254,10 +286,6 @@ export interface MongodbGetQuery {
 }
 export interface MysqlGetQuery {
   select?: string | string[]
-}
-export interface RedisGetQuery {
-  expireSec?: boolean
-  expireMillisec?: boolean
 }
 
 
@@ -280,6 +308,13 @@ export interface MongodbFindRes {
   [key: string]: any
 }
 export interface MysqlFindRes {
+  data: {
+    objects: any[]
+    [key: string]: any
+  }
+  [key: string]: any
+}
+export interface RedisFindRes {
   data: {
     objects: any[]
     [key: string]: any
@@ -310,15 +345,16 @@ export interface MysqlSetRes {
   [key: string]: any
 }
 export interface RedisSetRes {
-  data: any
-  [key: string]: any
+  data: {
+    insertId?: string
+    [key: string]: any
+  }
 }
 export interface FastdbSetRes {
   data: {
     insertId?: string | number
     [key: string]: any
   }
-  [key: string]: any
 }
 
 
@@ -330,6 +366,11 @@ export interface MongodbSetmanyRes {
     insertedIds: {
       [key: string]: any
     }
+    [key: string]: any
+  }
+}
+export interface RedisSetmanyRes {
+  data: {
     [key: string]: any
   }
 }
@@ -350,11 +391,9 @@ export interface MongodbGetRes {
 }
 export interface RedisGetRes {
   data: {
-    expireSec?: number
-    expireMillisec?: number
+    _expire?: number
     [key: string]: any
   }
-  [key: string]: any
 }
 export interface FastdbGetRes {
   data: {
@@ -389,15 +428,16 @@ export interface MongodbUpdateRes {
   }
 }
 export interface RedisUpdateRes {
-  data: any
-  [key: string]: any
+  data: {
+    modifiedCount?: number
+    [key: string]: any
+  }
 }
 export interface FastdbUpdateRes {
   data: {
     id?: string | number
     [key: string]: any
   }
-  [key: string]: any
 }
 
 
@@ -417,7 +457,9 @@ export interface MongodbDeleteRes {
   }
 }
 export interface RedisDeleteRes {
-  data: number
+  data: {
+    deletedCount: number
+  }
 }
 export interface FastdbDeleteRes {
   data: number
@@ -437,17 +479,3 @@ export interface MysqlTransactionRes {
 }
 
 
-
-// none (key不存在)
-// string (字符串)
-// list (列表)
-// set (集合)
-// zset (有序集)
-// hash (哈希表)
-// redis为数据结构
-export type TStructure = 'string' | 'hash' | 'list' | 
-'set' | 'zset'
-
-export interface RedisStringSet {
-  [key: string]: any
-}

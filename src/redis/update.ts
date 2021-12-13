@@ -1,24 +1,47 @@
 
 import {redisClient} from '../utils/dbRedis'
-import {TStructure, RedisUpdateRes, RedisUpdateParams, RedisStringUpdateParams} from '../index'
+import {RedisUpdateRes, RedisUpdateParams, TTable} from '../index'
 import updateTrans from '../utils/updateTrans'
 import {PLATFORM_NAME} from '../constants/constants'
-import {REDIS_SET_ERROR} from '../constants/error'
 
-function fetchUpdate(structure: 'string', params: RedisStringUpdateParams): Promise<RedisUpdateRes | string>
-function fetchUpdate(structure: TStructure, params: RedisUpdateParams = {}): Promise<RedisUpdateRes | string>{
-  return new Promise((resolve, reject)=>{
-    let tempData: {keyValue: any[], method: string, key: string[]} = updateTrans(params, {structure}, PLATFORM_NAME.REDIS)
-    if(tempData.keyValue.length < 2){
-      throw new Error(REDIS_SET_ERROR)
-    }
-    // TODO  过期时间、过期日期的更新
-    redisClient[tempData.method](...tempData.keyValue, async (err, reply) => {
-      if (err) {
-        reject({err})
+
+function fetchUpdate(table: TTable, id: string | number, params: RedisUpdateParams = {}, expire?: number): Promise<RedisUpdateRes>{
+  return new Promise(async (resolve, reject)=>{
+    try{
+      const tempData = updateTrans<RedisUpdateParams>(params, [table, id], PLATFORM_NAME.REDIS)
+      let func: any = [], hkey: any = ''
+      for(let i = 0; i < tempData.length; i++){
+        switch(tempData[i].method){
+          case 'SETNX':
+            func.push(redisClient[tempData[i].method](tempData[i].key, tempData[i].value))
+            if(expire) func.push(redisClient.PEXPIRE(tempData[i].key, expire))
+            break
+          case 'HSET':
+            hkey = tempData[i].key
+            func.push(redisClient[tempData[i].method](tempData[i].key, ...tempData[i].value))
+            break
+          case 'HDEL':
+            hkey = tempData[i].key
+            func.push(redisClient[tempData[i].method](tempData[i].key, tempData[i].value))
+            break
+          case 'HINCRBYFLOAT':
+            hkey = tempData[i].key
+            func.push(redisClient[tempData[i].method](tempData[i].key, ...tempData[i].value))
+            break
+          case 'HINCRBY':
+            hkey = tempData[i].key
+            func.push(redisClient[tempData[i].method](tempData[i].key, ...tempData[i].value))
+            break
+          default:
+            break
+        }
       }
-      resolve({data: reply})
-    })
+      if(expire) func.push(redisClient.PEXPIRE(hkey, expire))
+      await Promise.all(func)
+      resolve({data: {modifiedCount: 1}})
+    }catch(err: any){
+      reject(err)
+    }
   })
 }
 
