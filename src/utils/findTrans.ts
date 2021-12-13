@@ -1,5 +1,5 @@
 import {PLATFORM_NAME, J_NAME_LIST} from '../constants/constants'
-import {FIND_CHECKR_ERROR, FIND_P_ERROR, FIND_P_BETWEEN_ERROR, FIND_NO_PJ_ERROR, PARAMS_NOT_ARR_ERROR, PARAMS_EMPTY_ARR_ERROR} from '../constants/error'
+import {FIND_CHECKR_ERROR, FIND_P_ERROR, FIND_P_BETWEEN_ERROR, FIND_NO_PJ_ERROR, PARAMS_EMPTY_ARR_ERROR} from '../constants/error'
 import {changeFindGeoJson, isArray, changeSqlParam, isMongodbObjectId} from './utils'
 
 export default function findTrans<T>(params: T, r_num: number, query_data, dbType){
@@ -309,7 +309,6 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
           }
           break
         case 'in':
-          if(!isArray(tempParam)) throw new Error(PARAMS_NOT_ARR_ERROR)
           if(tempParam.length === 0) throw new Error(PARAMS_EMPTY_ARR_ERROR)
           if(r_num === 2 && J_NAME_LIST.indexOf(fieldName) > -1){
             if(!params[fieldName]) throw new Error(FIND_NO_PJ_ERROR + fieldName)
@@ -319,7 +318,6 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
           }
           break
         case 'notIn':
-          if(!isArray(tempParam)) throw new Error(PARAMS_NOT_ARR_ERROR)
           if(tempParam.length === 0) throw new Error(PARAMS_EMPTY_ARR_ERROR)
           if(r_num === 2 && J_NAME_LIST.indexOf(fieldName) > -1){
             if(!params[fieldName]) throw new Error(FIND_NO_PJ_ERROR + fieldName)
