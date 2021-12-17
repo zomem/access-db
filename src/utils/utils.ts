@@ -103,27 +103,30 @@ export const changeSqlParam = (param: any) => {
   if(param){
     // param 存在
     if(isNumber(param)){
-      return result = param
+      result = param
+    }
+    if(typeof(param) === 'string'){
+      result = `'${param.replace("'", "\\\'")}'`
     }
     if(typeof(param) === 'boolean'){
-      return result = 'TRUE'
+      result = 'TRUE'
     }
   }else{
     // param 为否  可能为   null '' 0 false
     if(typeof(param) === 'undefined'){
-      return result = `''`
+      result = `''`
     }
     if(typeof(param) === 'string'){
-      return result = `''`
+      result = `''`
     }
     if(typeof(param) === 'number' && !isNaN(param)){
-      return result = 0
+      result = 0
     }
     if(typeof(param) === 'boolean'){
-      return result = 'FALSE'
+      result = 'FALSE'
     }
     if(typeof(param) === 'object'){
-      return result = 'NULL'
+      result = 'NULL'
     }
   }
   return result

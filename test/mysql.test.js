@@ -3,45 +3,35 @@ require('dotenv').config()
 const {mysql} = require('../lib/index')
 
 
-const SETTIME = 'settime'
-
-const TABLE_1 = 'test'
-
-const DATA_1 = {
-  title: '同工 工工',
-  name: 'ifma',
-  age: '9l',
-  arr: [],
-  obj: {},
-  geop: ['geo', [3, 2]],
-  geops: ['geo', [13, 33], [1,2], [2, 3], [13, 33]],
-  create_at: new Date(),
-}
-const DATA_M = [
-  {
-    title: '这',
-    name: 'ond',
-    age: 2,
-    arr: ['a', 'c'],
-  },
-  {
-    title: '这晨',
-    name: 'asdf',
-    age: 12,
-    arr: ['a', 'cc'],
-  },
-  {
-    title: '革载',
-    name: 'te',
-    age: 22,
-    arr: ['aa', 'c'],
-  }
-]
 
 
-
-test('mysql_updatemany_test: ', async () => {
+test('mysql test: ', async () => {
+  // await mysql.set('book', {
+  //   title: "m'y",
+  //   num: 23,
+  //   price: 32.23
+  // })
+  // await mysql.set('book', {
+  //   title: `m'y",,a#@!@$$^&^%&&#$,,adflll+_)(_)*)(32389)`,
+  //   num: 23,
+  //   price: 32.23
+  // })
+  await mysql.update('book',  {id: 8},{
+    title: `m'y",,a#@!@$$^&^%&&#$,,adflll+_)(_)*)(32389)`,
+    num:1110,
+    price: 32.23
+  })
+  // await mysql.update('book')
+  let a = await mysql.find('book', {
+    p0: ['title', 'like', `%m'y",,a#@!@$$^&^%&%`],
+    r: 'p0'
+  })
+  // console.log('aaaa', a)
+  console.log('aaaa', a.data.objects)
+  await mysql.del('book', {title: `m'y",,a#@!@$$^&^%&&#$,,adflll+_)(_)*)(32389)`})
   
+
+  return
   let num = (await mysql.count('money', {
     p0: ['uid', '>', 1],
     r: 'p0'
