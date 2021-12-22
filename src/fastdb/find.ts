@@ -39,7 +39,7 @@ function fetchFind(table: string, params: FastdbCheckParams = {}): FastdbFindRes
       }
       index++
     }
-    result = result.slice(-limit)
+    result = result.slice(all - limit, all)
   }else{
     while (result.length < all && t_positon < oldBuf.length) { 
       let start = oldBuf.lastIndexOf(`{"id":`, t_positon)
@@ -56,7 +56,7 @@ function fetchFind(table: string, params: FastdbCheckParams = {}): FastdbFindRes
       }
       t_positon = end + POSITION_STEP
     }
-    result = result.slice(-limit)
+    result = result.slice(all - limit, all)
   }
 
   // let tempAdd: any[] = []

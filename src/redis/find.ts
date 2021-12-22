@@ -11,6 +11,11 @@ function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisF
       let skeys = await redisClient.KEYS(fkeys)
       let result: any = []
 
+      if(skeys.length === 0){
+        return resolve({data: {objects: result || []}})
+      }
+      let limit = (params.limit || 20)
+      let all = limit * (params.page || 1)
       // 仅翻页的情况
       if(!params.r && !params.orderBy){
         let skeysValueList = await redisClient.MGET(skeys)
@@ -18,7 +23,7 @@ function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisF
         
         let pskeys: string[] = [] // 每页的
         if(params.limit){
-          pskeys = newSkeys.slice(((params.page || 1) - 1) * params.limit, ((params.page || 1)) * params.limit)
+          pskeys = newSkeys.slice(all - limit, all)
         }else{
           pskeys = newSkeys
         }
@@ -30,13 +35,20 @@ function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisF
           func.push(redisClient.HGETALL(hkeys[i]))
         }      
         result = (await Promise.all(func)) as any
-      }else{
-        let limit = (params.limit || 20)
-        let all = limit * (params.page || 1)
-        let newarr: any = [], t_json
         
-        for(let j = 0; j < skeys.length; j++){
-          func.push(redisClient.HGETALL(skeys[j].replace('id:key:', '')))
+      }else{
+        let newarr: any = [], t_json, newSkeys
+
+        if(!params.orderBy){
+          let skeysValueList = await redisClient.MGET(skeys)
+          newSkeys = stringTimeNumSort(skeysValueList, skeys)
+          for(let j = 0; j < newSkeys.length; j++){
+            func.push(redisClient.HGETALL(newSkeys[j].replace('id:key:', '')))
+          }
+        }else{
+          for(let j = 0; j < skeys.length; j++){
+            func.push(redisClient.HGETALL(skeys[j].replace('id:key:', '')))
+          }
         }
 
         newarr = (await Promise.all(func)) as any
@@ -52,15 +64,16 @@ function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisF
         }
         
         let index: number = 0
-        while (result.length < all && index < newarr.length) { 
-          t_json = newarr[index]
-          let isOk = findTrans(params, 1, t_json, PLATFORM_NAME.REDIS)
-          if(isOk){
-            result.push(t_json)
+        while (index < all && index < newarr.length) {
+          if(index >= all - limit){
+            t_json = newarr[index]
+            let isOk = findTrans(params, 1, t_json, PLATFORM_NAME.REDIS)
+            if(isOk){
+              result.push(t_json)
+            }
           }
           index++
         }
-        result = result.slice(-limit)
       }
 
       resolve({data: {objects: result || []}})

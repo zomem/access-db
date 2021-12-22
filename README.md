@@ -1,5 +1,6 @@
 ### 统一各类数据库的连接    
 [access-db文档](https://access-db.cn)  
+[更新日志](https://access-db.cn/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)  
 #### 使用示例：  
 ```js 
 import {mysql, mongodb, redis, fastdb} from 'access-db'
@@ -21,7 +22,7 @@ async function exp() {
 > npm install access-db dotenv   
 
 #### 在项目根目录新建`.env`文件，然后填写配置信息   
-然后在项目最开始，尽可能早的引入`require('dotenv').config()`，详情可以查看dotenv的使用  
+然后在项目最开始(app.js)，尽可能早的引入`require('dotenv').config()`，详情可以查看dotenv的使用  
 `.env`配置如下  
   
 > MYSQL_HOST  MONGODB_HOST  REDIS_HOST  FASTDB_DIR
@@ -80,7 +81,8 @@ async function exp() {
 
   
 ### Unified access to all kinds of databases     
-[access-db文档](https://access-db.cn)   
+[access-db document](https://access-db.cn)   
+[ChangeLog](https://access-db.cn/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)  
 #### use:   
 ```js 
 import {mysql, mongodb, redis, fastdb} from 'access-db'
@@ -102,7 +104,7 @@ async function exp() {
 > npm install access-db dotenv    
    
 #### Create a new `.env` file in the project root directory, and then fill in the configuration information  
-Then introduce `require('dotenv').config()` as early as possible at the beginning of the project   
+Then introduce `require('dotenv').config()` as early as possible at the beginning of the project(app.js)   
 `.env` is configured as follows  
   
 > MYSQL_HOST  MONGODB_HOST  REDIS_HOST  FASTDB_DIR
