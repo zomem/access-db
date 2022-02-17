@@ -79,7 +79,7 @@ async function exp() {
   
   
 #### 案例  
-![纸禾禾](https://file.zomem.com/zhihehe/images/wzj.jpeg)  
+![纸禾禾](https://file.zomem.com/zhihehe/images/wzj.jpeg){:height="25%" width="25%"}  
  
 
   
