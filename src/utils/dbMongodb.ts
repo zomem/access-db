@@ -33,10 +33,14 @@ export const mongodbCollection = {
 
 
 
-export const mongodbId = (id) => {
-  // let hex = /^[a-fA-F0-9]{24}$/
-  // let tempId = (hex.test(id as string)) ? (new ObjectId(id)) : id
-  let tempId = new ObjectId(id)
+export const mongodbId = (id: any) => {
+  let tempId
+  if(typeof(id) === 'string'){
+    let hex = /^[a-fA-F0-9]{24}$/
+    tempId = (hex.test(id)) ? (new ObjectId(id)) : id
+  }else{
+    tempId = id
+  }
   return tempId
 }
 

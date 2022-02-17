@@ -1,4 +1,3 @@
-
 import {isArray} from '../utils/utils'
 import {TTable, RedisSetParams, RedisSetmanyRes} from '../index'
 import {SET_MANY_PARAMS_ARR_ERROR, PARAMS_EMPTY_ARR_ERROR} from '../constants/error'

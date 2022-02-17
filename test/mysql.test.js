@@ -6,6 +6,7 @@ const {mysql} = require('../lib/index')
 
 
 test('mysql test: ', async () => {
+  return
   // await mysql.set('book', {
   //   title: "m'y",
   //   num: 23,

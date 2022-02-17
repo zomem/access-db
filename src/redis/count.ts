@@ -1,6 +1,6 @@
 
 
-import {redisClient} from '../utils/dbRedis'
+import {redisClient, reTable} from '../utils/dbRedis'
 import {CountRes, TTable, RedisCountParams} from '../index'
 import findTrans from '../utils/findTrans'
 import {PLATFORM_NAME} from '../constants/constants'
@@ -9,7 +9,7 @@ import {PLATFORM_NAME} from '../constants/constants'
 function fetchCount(table: TTable, params: RedisCountParams = {}): Promise<CountRes>{
   return new Promise(async (resolve, reject)=>{
     try{
-      let fkeys: string = table + ':id:key:*'
+      let fkeys: string = reTable(table) + ':id:key:*'
       let skeys = await redisClient.KEYS(fkeys)
       let num: number = 0
       if(!params.r){

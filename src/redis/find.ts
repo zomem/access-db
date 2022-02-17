@@ -1,4 +1,4 @@
-import {redisClient} from '../utils/dbRedis'
+import {redisClient, reTable} from '../utils/dbRedis'
 import {RedisFindRes, TTable, RedisCheckParams} from '../index'
 import {stringTimeNumSort, RedisSortNum, RedisSortStr} from '../utils/utils'
 import findTrans from '../utils/findTrans'
@@ -7,7 +7,7 @@ import { PLATFORM_NAME } from '../constants/constants'
 function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisFindRes>{
   return new Promise(async (resolve, reject)=>{
     try{
-      let func: any = [], fkeys: string = table + ':id:key:*'
+      let func: any = [], fkeys: string = reTable(table) + ':id:key:*'
       let skeys = await redisClient.KEYS(fkeys)
       let result: any = []
 
@@ -64,16 +64,15 @@ function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisF
         }
         
         let index: number = 0
-        while (index < all && index < newarr.length) {
-          if(index >= all - limit){
-            t_json = newarr[index]
-            let isOk = findTrans(params, 1, t_json, PLATFORM_NAME.REDIS)
-            if(isOk){
-              result.push(t_json)
-            }
+        while (result.length < all && index < newarr.length) {
+          t_json = newarr[index]
+          let isOk = findTrans(params, 1, t_json, PLATFORM_NAME.REDIS)
+          if(isOk){
+            result.push(t_json)
           }
           index++
         }
+        result = result.slice(all - limit, all)
       }
 
       resolve({data: {objects: result || []}})

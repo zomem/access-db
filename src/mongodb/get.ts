@@ -13,7 +13,7 @@ import {MongodbGetRes, TTable, MongodbUpdateKey} from '../index'
 const {client, db} = mongodbCollection
 
 
-function fetchGet(table: TTable, uniKey: string | MongodbUpdateKey): Promise<MongodbGetRes>{
+function fetchGet(table: TTable, uniKey: number | string | MongodbUpdateKey): Promise<MongodbGetRes>{
   if(!client) return
   return new Promise(async (resolve, reject)=>{
     try{
@@ -25,6 +25,7 @@ function fetchGet(table: TTable, uniKey: string | MongodbUpdateKey): Promise<Mon
           tempData = uniKey
         }else{
           tempData['_id'] = mongodbId(uniKey)
+          console.log(tempData)
         }
       }
 
@@ -32,7 +33,7 @@ function fetchGet(table: TTable, uniKey: string | MongodbUpdateKey): Promise<Mon
       
       let res: any = await db.collection(table).findOne(tempData)
       await client.close()
-      resolve({data: res})
+      resolve({data: res || {}})
     }catch(err){
       await client.close()
       reject(err)

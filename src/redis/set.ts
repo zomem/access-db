@@ -1,5 +1,5 @@
 
-import {redisClient} from '../utils/dbRedis'
+import {redisClient, reTable} from '../utils/dbRedis'
 import {TTable, RedisSetRes, RedisSetParams} from '../index'
 import setTrans from '../utils/setTrans'
 import { PLATFORM_NAME } from '../constants/constants'
@@ -9,7 +9,7 @@ import { PLATFORM_NAME } from '../constants/constants'
 function fetchSet(table: TTable, params: RedisSetParams = {}, expire?: number): Promise<RedisSetRes>{
   return new Promise(async (resolve, reject)=>{
     try{
-      const tempData = setTrans<RedisSetParams>(params, table, PLATFORM_NAME.REDIS)
+      const tempData = setTrans<RedisSetParams>(params, reTable(table), PLATFORM_NAME.REDIS)
       let func: any = [], hkey: any = ''
       for(let i = 0; i < tempData.length; i++){
         switch(tempData[i].method){

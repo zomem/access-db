@@ -1,5 +1,5 @@
 
-import {redisClient} from '../utils/dbRedis'
+import {redisClient, reTable} from '../utils/dbRedis'
 import {RedisUpdateRes, RedisUpdateParams, TTable} from '../index'
 import updateTrans from '../utils/updateTrans'
 import {PLATFORM_NAME} from '../constants/constants'
@@ -8,7 +8,7 @@ import {PLATFORM_NAME} from '../constants/constants'
 function fetchUpdate(table: TTable, id: string | number, params: RedisUpdateParams = {}, expire?: number): Promise<RedisUpdateRes>{
   return new Promise(async (resolve, reject)=>{
     try{
-      const tempData = updateTrans<RedisUpdateParams>(params, [table, id], PLATFORM_NAME.REDIS)
+      const tempData = updateTrans<RedisUpdateParams>(params, [reTable(table), id], PLATFORM_NAME.REDIS)
       let func: any = [], hkey: any = ''
       for(let i = 0; i < tempData.length; i++){
         switch(tempData[i].method){

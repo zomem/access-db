@@ -12,7 +12,7 @@ import {TTable, MongodbDeleteRes, MongodbUpdateKey} from '../index'
 
 const {client, db} = mongodbCollection
 
-function fetchDel(table: TTable, uniKey: string | MongodbUpdateKey): Promise<MongodbDeleteRes>{
+function fetchDel(table: TTable, uniKey: number | string | MongodbUpdateKey): Promise<MongodbDeleteRes>{
   if(!client) return
   return new Promise(async (resolve, reject)=>{
     try{

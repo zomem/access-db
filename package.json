@@ -1,6 +1,6 @@
 {
   "name": "access-db",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "Unified access to all kinds of databases",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -19,9 +19,9 @@
   },
   "homepage": "https://access-db.cn/",
   "dependencies": {
-    "mongodb": "^4.2.1",
+    "mongodb": "^4.3.1",
     "mysql": "^2.18.1",
-    "redis": "^4.0.0"
+    "redis": "^4.0.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",
