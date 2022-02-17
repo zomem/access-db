@@ -79,7 +79,7 @@ async function exp() {
   
   
 #### 成功案例  
- <img src="https://file.zomem.com/zhihehe/images/wzj.jpeg" style="height:25%;width:25%" />
+<img src="https://file.zomem.com/zhihehe/images/wzj.jpeg" style="height:20%;width:20%" />  
 
   
 ### Unified access to all kinds of databases     
