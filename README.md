@@ -78,9 +78,8 @@ async function exp() {
 | Redis   | 高性能的 key-value 数据库                     | 6.x, 5.x |
   
   
-#### 案例  
-![纸禾禾](https://file.zomem.com/zhihehe/images/wzj.jpeg){:height="25%" width="25%"}  
- 
+#### 成功案例  
+ <img src="https://file.zomem.com/zhihehe/images/wzj.jpeg" style="height:25%;width:25%" />
 
   
 ### Unified access to all kinds of databases     
