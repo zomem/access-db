@@ -7,10 +7,14 @@ import {mysql, mongodb, redis, fastdb} from 'access-db'
 
 async function exp() {
   fastdb.set('city', {id: 1, name: 'one'})
+
+  await mongodb.get('tableName1', id)
+
   await mysql.find('tableName2', {
-    p0: ['num', '=', (await mongodb.get('tableName1', id)).data.num],
+    p0: ['num', '=', 32],
     r: 'p0'
   })
+
   await redis.set('tableName2', {
     id: 2,
     num: 12
@@ -91,10 +95,14 @@ import {mysql, mongodb, redis, fastdb} from 'access-db'
 
 async function exp() {
   fastdb.set('city', {id: 1, name: 'one'})
+
+  await mongodb.get('tableName1', id)
+
   await mysql.find('tableName2', {
-    p0: ['num', '=', (await mongodb.get('tableName1', id)).data.num],
+    p0: ['num', '=', 32],
     r: 'p0'
   })
+
   await redis.set('tableName2', {
     id: 2,
     num: 12
