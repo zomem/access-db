@@ -5,12 +5,69 @@ import {
   REDIS_UPDATE_METHORD,
   FASTDB_UPDATE_METHORD
 } from '../constants/constants'
-import {isArray, changeSqlParam} from './utils'
+import {isArray, changeSqlParam, isMongodbObjectId} from './utils'
 import {UPDATE_ERROR} from '../constants/error'
+import { mongodbId } from './dbMongodb'
+import updateTrans from './updateTrans'
 
-export default function updateTrans<T>(params: T, query, dbType){
+export default function updatemanyTrans<T>(params: T, query, dbType){
 
-  let result
+  let result: any
+
+  if(dbType === PLATFORM_NAME.MONGODB){
+    let oldParams = params as any
+    let tempParams = [...oldParams]
+    let bulkList: any = []
+    let keys: any = []
+    if(isArray(query)){
+      keys = query
+    }else{
+      keys = [query]
+    }
+    for(let i = 0; i < oldParams.length; i++){
+      if(keys.length === 1){
+        let querySon: any = {}
+        if(keys[0] === '_id'){
+          if(isMongodbObjectId(oldParams[i]._id)){
+            querySon['_id'] = oldParams[i]._id
+          }else{
+            querySon['_id'] = mongodbId(oldParams[i]._id)
+          }
+        }else{
+          querySon[`${keys[0]}`] = oldParams[i][keys[0]]
+        }
+        delete tempParams[i][keys[0]]
+        bulkList.push({
+          updateMany: {
+            filter: querySon,
+            update: updateTrans(tempParams[i], {}, PLATFORM_NAME.MONGODB),
+          }
+        })
+      }else{
+        let querySon: any = {'$and': []}
+        for(let j = 0; j < keys.length; j++){
+          if(keys[j] === '_id'){
+            if(isMongodbObjectId(oldParams[i]._id)){
+              querySon['$and'].push({_id: oldParams[i]._id})
+            }else{
+              querySon['$and'].push(mongodbId(oldParams[i]._id))
+            }
+          }else{
+            querySon['$and'].push({[`${keys[j]}`]: oldParams[i][keys[j]]})
+          }
+          delete tempParams[i][keys[j]]
+        }
+        bulkList.push({
+          updateMany: {
+            filter: querySon,
+            update: updateTrans(tempParams[i], {}, PLATFORM_NAME.MONGODB),
+          }
+        })
+      }
+    }
+
+    result = bulkList
+  }
 
   //mysql类
   if(dbType === PLATFORM_NAME.MYSQL){

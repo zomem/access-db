@@ -10,20 +10,20 @@ import {mongodbCollection} from '../utils/dbMongodb'
 import {changeSetParams} from '../utils/utils'
 import {TTable, MongodbSetParams, MongodbSetRes} from '../index'
 
-const {client, db} = mongodbCollection
 
 
 function fetchSet(table: TTable, params: MongodbSetParams): Promise<MongodbSetRes>{
-  if(!client) return
   return new Promise(async (resolve, reject)=>{
+    const {client, db} = await mongodbCollection()
+    if(!client) return
     try{
       await client.connect()
       let res = await db.collection(table).insertOne(changeSetParams(params))
-      await client.close()
       resolve({data: res})
+      client.close()
     }catch(err){
-      await client.close()
       reject(err)
+      client.close()
     }
   })
 }

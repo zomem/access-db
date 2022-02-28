@@ -240,6 +240,11 @@ export interface MongodbUpdateParams {
 export interface MysqlUpdateParams {
   [key: string]: [TMysqlUpdateMethod, dataType] | dataType
 }
+export interface MongodbUpdatemanyParams{
+  [key: number]: {
+    [keyi: string]: [TMongodbUpdateMethod, dataType] | dataType
+  }
+}
 export interface MysqlUpdatemanyParams{
   [key: number]: {
     [keyi: string]: [TMysqlUpdateMethod, dataType] | dataType
@@ -424,6 +429,16 @@ export interface MongodbUpdateRes {
     acknowledged: boolean
     modifiedCount: number
     matchedCount: number
+    upsertedId?: any
+    [key: string]: any
+  }
+}
+export interface MongodbUpdatemanyRes {
+  data: {
+    acknowledged: boolean
+    modifiedCount: number
+    matchedCount: number
+    upsertedId?: any
     [key: string]: any
   }
 }
@@ -479,3 +494,5 @@ export interface MysqlTransactionRes {
 }
 
 
+//trigger
+// export type TMysqlTrigger = 'set' | 'update' | 'del'

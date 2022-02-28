@@ -24,11 +24,12 @@ if(process.env.MONGODB_USER){
     + (process.env.MONGODB_PORT || '27017')
 }
 
-let client = new MongoClient(dbUri)
-
-export const mongodbCollection = {
-  client: process.env.MONGODB_HOST ? client : null,
-  db: process.env.MONGODB_HOST ? client.db(process.env.MONGODB_DATABASE) : null
+export const mongodbCollection = async () => {
+  const client = await MongoClient.connect(dbUri)
+  return {
+    client: process.env.MONGODB_HOST ? client : null,
+    db: process.env.MONGODB_HOST ? client.db(process.env.MONGODB_DATABASE) : null
+  }
 }
 
 

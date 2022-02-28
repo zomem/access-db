@@ -6,15 +6,14 @@ import findTrans from '../utils/findTrans'
 import {PLATFORM_NAME} from '../constants/constants'
 
 
-const {client, db} = mongodbCollection
-
 
 function fetchFind(table: TTable, params: MongodbCheckParams): Promise<MongodbFindRes>
 function fetchFind(table: TTable, params: MongodbCheckParams, query: TSentence): Promise<any>
 function fetchFind(table: TTable, params: MongodbCheckParams = {}, query?: TSentence): Promise<MongodbFindRes | any>{
-  if(!client) return
-  if(!table) throw new Error(PARAM_TABLE_ERROR)
   return new Promise(async (resolve, reject)=>{
+    const {client, db} = await mongodbCollection()
+    if(!client) return
+    if(!table) throw new Error(PARAM_TABLE_ERROR)
     try{
       let QQ = findTrans<MongodbCheckParams>(params, 1, null, PLATFORM_NAME.MONGODB)
       let sortObj = {}
@@ -38,12 +37,11 @@ function fetchFind(table: TTable, params: MongodbCheckParams = {}, query?: TSent
                 .skip((params.limit || 20) * ((params.page || 1) - 1))
                 .sort(sortObj).toArray()
 
-      await client.close()
       resolve({data: {objects: res || []}})
-
+      client.close()
     }catch(err){
-      await client.close()
       reject(err)
+      client.close()
     }
   })
 }

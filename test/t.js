@@ -2,10 +2,26 @@ const hrtime = require('process').hrtime
 
 const start = hrtime.bigint();
 
-let arr = []
+const {mysql} = require('../lib/index')
 
-console.time('for')
-for(let i = 0; i < 10000000; i++){
- arr.push(i)
+let tempa = process.argv.splice(2)[0]
+console.log('tempaaaaa', tempa)
+
+
+const getUser = (t) => {
+  console.log('uuuuuuuuuuuuuuuu', t)
 }
-console.timeEnd('for')
+getUser(tempa)
+
+
+
+var EventEmitter = require('events').EventEmitter; 
+var event = new EventEmitter(); 
+event.on('some_event', function(e) { 
+    console.log('some_event 事件触发', e); 
+}); 
+setTimeout(function() { 
+    event.emit('some_event'); 
+}, 1000);
+
+

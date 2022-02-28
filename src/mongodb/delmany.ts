@@ -4,11 +4,12 @@ import {isJson, isMongodbObjectId, isArray} from '../utils/utils'
 import {TTable, MongodbDeleteRes, MongodbUpdateKey} from '../index'
 import {PARAMS_EMPTY_ARR_ERROR, PARAMS_NOT_ARR_ERROR} from '../constants/error'
 
-const {client, db} = mongodbCollection
+
 
 function fetchDelmany(table: TTable, uniKeys: number[] | string[] | MongodbUpdateKey[]): Promise<MongodbDeleteRes>{
-  if(!client) return
   return new Promise(async (resolve, reject)=>{
+    const {client, db} = await mongodbCollection()
+    if(!client) return
     try{
       let tempID='_id', tempData: any[] = []
       if(!isArray(uniKeys)) throw new Error(PARAMS_NOT_ARR_ERROR)
@@ -36,11 +37,11 @@ function fetchDelmany(table: TTable, uniKeys: number[] | string[] | MongodbUpdat
       }
       await client.connect()
       let res: any = await db.collection(table).deleteMany({[tempID]: {'$in': tempData}})
-      await client.close()
       resolve({data: res})
+      client.close()
     }catch(err){
-      await client.close()
       reject(err)
+      client.close()
     }
   })
 }

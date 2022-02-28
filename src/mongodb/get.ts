@@ -10,12 +10,12 @@ import {mongodbCollection, mongodbId} from '../utils/dbMongodb'
 import {isJson, isMongodbObjectId} from '../utils/utils'
 import {MongodbGetRes, TTable, MongodbUpdateKey} from '../index'
 
-const {client, db} = mongodbCollection
 
 
 function fetchGet(table: TTable, uniKey: number | string | MongodbUpdateKey): Promise<MongodbGetRes>{
-  if(!client) return
   return new Promise(async (resolve, reject)=>{
+    const {client, db} = await mongodbCollection()
+    if(!client) return
     try{
       let tempData: any = {}
       if(isMongodbObjectId(uniKey)){
@@ -32,11 +32,11 @@ function fetchGet(table: TTable, uniKey: number | string | MongodbUpdateKey): Pr
       await client.connect()
       
       let res: any = await db.collection(table).findOne(tempData)
-      await client.close()
       resolve({data: res || {}})
+      client.close()
     }catch(err){
-      await client.close()
       reject(err)
+      client.close()
     }
   })
 }

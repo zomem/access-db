@@ -7,6 +7,7 @@ import get_temp from './get'
 import set_temp from './set'
 import setmany_temp from './setmany'
 import update_temp from './update'
+import updatemany_temp from './updatemany'
 
 
 export default {
@@ -18,6 +19,7 @@ export default {
   set: set_temp,
   setmany: setmany_temp,
   update: update_temp,
+  updatemany: updatemany_temp,
 }
 
 

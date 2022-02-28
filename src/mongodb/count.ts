@@ -11,21 +11,20 @@ import {TTable, MongodbCountParams, CountRes} from '../index'
 import {PLATFORM_NAME} from '../constants/constants'
 import findTrans from '../utils/findTrans'
 
-const {client, db} = mongodbCollection
-
 
 function fetchCount(table: TTable, params: MongodbCountParams = {}): Promise<CountRes>{
-  if(!client) return
   return new Promise(async (resolve, reject)=>{
+    const {client, db} = await mongodbCollection()
+    if(!client) return
     try{
       let QQ = findTrans<MongodbCountParams>(params, 1, null, PLATFORM_NAME.MONGODB) || {}
       await client.connect()
       let res: any = await db.collection(table).find(QQ === 2 ? {} : QQ).count()
-      await client.close()
       resolve({data: res})
+      client.close()
     }catch(err){
-      await client.close()
       reject(err)
+      client.close()
     }
   })
 }

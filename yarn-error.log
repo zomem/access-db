@@ -1,0 +1,78 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/bin/yarn add mongodb@latest
+
+PATH: 
+  /opt/homebrew/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/usr/local/mysql/bin
+
+Yarn version: 
+  1.22.11
+
+Node version: 
+  16.13.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/typescript: ESOCKETTIMEDOUT
+      at ClientRequest.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141390:19)
+      at Object.onceWrapper (node:events:509:28)
+      at ClientRequest.emit (node:events:390:28)
+      at TLSSocket.emitRequestTimeout (node:_http_client:763:9)
+      at Object.onceWrapper (node:events:509:28)
+      at TLSSocket.emit (node:events:402:35)
+      at TLSSocket.Socket._onTimeout (node:net:501:8)
+      at listOnTimeout (node:internal/timers:557:17)
+      at processTimers (node:internal/timers:500:7)
+
+npm manifest: 
+  {
+    "name": "access-db",
+    "version": "0.2.0",
+    "description": "Unified access to all kinds of databases",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "scripts": {
+      "build": "npx tsc",
+      "test": "jest"
+    },
+    "files": [
+      "/lib"
+    ],
+    "author": "zomem",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/zomem/access-db"
+    },
+    "homepage": "https://access-db.cn/",
+    "dependencies": {
+      "mongodb": "^4.3.1",
+      "mysql": "^2.18.1",
+      "redis": "^4.0.3"
+    },
+    "devDependencies": {
+      "@types/jest": "^26.0.24",
+      "@types/mysql": "^2.15.19",
+      "@types/node": "^14.17.12",
+      "del": "^5.1.0",
+      "dotenv": "^10.0.0",
+      "gulp": "^4.0.2",
+      "gulp-uglify": "^3.0.2",
+      "jest": "^27.4.3",
+      "typescript": "^4.5.2"
+    },
+    "keywords": [
+      "access-db",
+      "mysql",
+      "mongodb",
+      "redis",
+      "fastdb"
+    ]
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
