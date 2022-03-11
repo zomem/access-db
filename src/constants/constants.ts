@@ -11,6 +11,7 @@ export const PLATFORM_NAME = {
   MONGODB: 'mongodb',     //MongoDB 数据库
   MYSQL: 'mysql',         //mysql 数据库
   REDIS: 'redis',         //redis 数据库
+  ELASTICSEARCH: 'elasticsearch',  // elasticsearch 搜索引擎
   FASTDB: 'fastdb'        //json本地 
 }
 

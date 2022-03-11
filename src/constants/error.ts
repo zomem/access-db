@@ -45,3 +45,7 @@ export const FASTDB_GET_ID_ERROR = 'The id should not be undefined.'
 export const FASTDB_HAVE_ID_ERROR = 'The id is already exists.'
 export const FASTDB_UPDATE_ID_ERROR = 'The id can not be a param.'
 export const FASTDB_UPDATE_JSON_ERROR = 'The parmas name use too many point.'
+
+
+// mongodb
+export const ID_EMPTY_ERROR = 'The update/updatemany method, key(exp: _id) could not be empty'

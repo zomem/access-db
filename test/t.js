@@ -10,6 +10,14 @@ console.log('tempaaaaa', tempa)
 
 const getUser = (t) => {
   console.log('uuuuuuuuuuuuuuuu', t)
+
+
+  let list = [{_id: '3333', name: 'qaa'}]
+  console.log(list)
+  let list2 = JSON.parse(JSON.stringify(list))
+  delete list[0]._id
+  console.log(list)
+  console.log(list2)
 }
 getUser(tempa)
 

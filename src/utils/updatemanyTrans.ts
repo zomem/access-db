@@ -1,9 +1,6 @@
 import {
-  PLATFORM_NAME, 
-  MONGODB_UPDATE_METHORD,
-  MYSQL_UPDATE_METHORD, 
-  REDIS_UPDATE_METHORD,
-  FASTDB_UPDATE_METHORD
+  PLATFORM_NAME,
+  MYSQL_UPDATE_METHORD,
 } from '../constants/constants'
 import {isArray, changeSqlParam, isMongodbObjectId} from './utils'
 import {UPDATE_ERROR} from '../constants/error'
@@ -16,7 +13,7 @@ export default function updatemanyTrans<T>(params: T, query, dbType){
 
   if(dbType === PLATFORM_NAME.MONGODB){
     let oldParams = params as any
-    let tempParams = [...oldParams]
+    let tempParams = JSON.parse(JSON.stringify(oldParams)) // 数组对象的深拷贝
     let bulkList: any = []
     let keys: any = []
     if(isArray(query)){

@@ -1,7 +1,8 @@
-import {GEO_POLYGON_ERROR} from '../constants/error'
+import {GEO_POLYGON_ERROR, ID_EMPTY_ERROR} from '../constants/error'
 
 
 export const isMongodbObjectId = (value: any) => {
+  if(!value) throw new Error(ID_EMPTY_ERROR)
   return value._bsontype === 'ObjectID'
 }
 export const isJson = (value: any) => {

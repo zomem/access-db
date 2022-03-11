@@ -14,7 +14,7 @@ const table = {
 
 
 test('mongodb: ', async () => {
-
+  return
   console.time('settime')
   const temp = await mongodb.set(table.users, {
     ...DATA[0],

@@ -74,6 +74,10 @@ export type TP = 'p0' | 'p1' | 'p2' | 'p3' | 'p4' | 'p5' | 'p6' | 'p7' | 'p8'
 
 
 
+/**
+ * find
+ */
+
 interface MysqlPRList {
   j0?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
   j1?: [string, TMysqlJiaMethod, 'distinct'] | [string, TMysqlJiaMethod, string] | [string, TMysqlJiaMethod]
@@ -205,6 +209,40 @@ export interface FastdbCheckParams extends FastdbPRList {
   // select?: string[]
 }
 
+//find方法的返回
+export interface MongodbFindRes {
+  data: {
+    objects: any[]
+    [key: string]: any
+  }
+  [key: string]: any
+}
+export interface MysqlFindRes {
+  data: {
+    objects: any[]
+    [key: string]: any
+  }
+  [key: string]: any
+}
+export interface RedisFindRes {
+  data: {
+    objects: any[]
+    [key: string]: any
+  }
+  [key: string]: any
+}
+export interface FastdbFindRes {
+  data: {
+    objects: any[]
+    [key: string]: any
+  }
+  [key: string]: any
+}
+
+
+/**
+ * count
+ */
 
 export interface MysqlCountParams extends MysqlPRList {
   
@@ -222,6 +260,10 @@ export interface CountRes {
   data: number
 }
 
+
+/**
+ * update  updatemany
+ */
 type TMongodbUpdateMethod = 'incr' | 'set' | 'unset' | 'geo' | 'append' | 'remove' | 'uAppend'
 type TMysqlUpdateMethod = 'incr' | 'set' | 'unset'
 type TFastdbUpdateMethod = 'incr' | 'set' | 'unset' | 'geo' | 'append' | 'remove' | 'uAppend'
@@ -264,152 +306,6 @@ export interface RedisUpdateParams {
 export interface FastdbUpdateParams {
   [key: string]: [TFastdbUpdateMethod, dataType] | dataType
 }
-
-
-type TMongodbSetMethod = 'geo'
-export interface MongodbSetParams {
-  [key: string]: [TMongodbSetMethod, dataType] | dataType
-}
-export interface MysqlSetParams {
-  [key: string]: dataType
-}
-export interface RedisSetParams {
-  [key: string]: number | string
-}
-
-export interface FastdbSetParams {
-  [key: string]: ['geo', dataType] | dataType
-}
-
-
-
-export interface MysqlGetKey{
-  [key: string]: string | number
-}
-export interface MongodbGetQuery {
-  select?: string | string[]
-}
-export interface MysqlGetQuery {
-  select?: string | string[]
-}
-
-
-
-export interface MysqlDeleteParams extends MysqlPRList {
-  page?: number
-  limit?: number
-}
-export interface MongodbDeleteParams extends MongodbPRList {
-  page?: number
-  limit?: number
-}
-
-//find方法的返回
-export interface MongodbFindRes {
-  data: {
-    objects: any[]
-    [key: string]: any
-  }
-  [key: string]: any
-}
-export interface MysqlFindRes {
-  data: {
-    objects: any[]
-    [key: string]: any
-  }
-  [key: string]: any
-}
-export interface RedisFindRes {
-  data: {
-    objects: any[]
-    [key: string]: any
-  }
-  [key: string]: any
-}
-export interface FastdbFindRes {
-  data: {
-    objects: any[]
-    [key: string]: any
-  }
-  [key: string]: any
-}
-
-//set返回
-export interface MongodbSetRes {
-  data: {
-    acknowledged: boolean
-    insertedId: any
-    [key: string]: any
-  }
-}
-export interface MysqlSetRes {
-  data: {
-    insertId?: string | number
-    [key: string]: any
-  }
-  [key: string]: any
-}
-export interface RedisSetRes {
-  data: {
-    insertId?: string
-    [key: string]: any
-  }
-}
-export interface FastdbSetRes {
-  data: {
-    insertId?: string | number
-    [key: string]: any
-  }
-}
-
-
-// setmany 返回
-export interface MongodbSetmanyRes {
-  data: {
-    acknowledged: boolean
-    insertedCount: number
-    insertedIds: {
-      [key: string]: any
-    }
-    [key: string]: any
-  }
-}
-export interface RedisSetmanyRes {
-  data: {
-    [key: string]: any
-  }
-}
-
-
-export interface MysqlGetRes {
-  data: {
-    id?: string | number
-    [key: string]: any
-  }
-  [key: string]: any
-}
-export interface MongodbGetRes {
-  data: {
-    _id: any
-    [key: string]: any
-  }
-}
-export interface RedisGetRes {
-  data: {
-    _expire?: number
-    [key: string]: any
-  }
-}
-export interface FastdbGetRes {
-  data: {
-    id?: string | number
-    [key: string]: any
-  }
-  [key: string]: any
-}
-
-
-
 
 
 export interface MysqlUpdateRes {
@@ -457,6 +353,135 @@ export interface FastdbUpdateRes {
 
 
 
+
+/**
+ * set 
+ */
+
+type TMongodbSetMethod = 'geo'
+export interface MongodbSetParams {
+  [key: string]: [TMongodbSetMethod, dataType] | dataType
+}
+export interface MysqlSetParams {
+  [key: string]: dataType
+}
+export interface RedisSetParams {
+  [key: string]: number | string
+}
+export interface ElasticsearchSetParams{
+  [key: string]: dataType
+}
+export interface FastdbSetParams {
+  [key: string]: ['geo', dataType] | dataType
+}
+
+//set返回
+export interface MongodbSetRes {
+  data: {
+    acknowledged: boolean
+    insertedId: any
+    [key: string]: any
+  }
+}
+export interface MysqlSetRes {
+  data: {
+    insertId?: string | number
+    [key: string]: any
+  }
+  [key: string]: any
+}
+export interface RedisSetRes {
+  data: {
+    insertId?: string
+    [key: string]: any
+  }
+}
+export interface ElasticsearchSetRes {
+  data: {
+    insertId?: string
+    [key: string]: any
+  }
+}
+export interface FastdbSetRes {
+  data: {
+    insertId?: string | number
+    [key: string]: any
+  }
+}
+
+// setmany 返回
+export interface MongodbSetmanyRes {
+  data: {
+    acknowledged: boolean
+    insertedCount: number
+    insertedIds: {
+      [key: string]: any
+    }
+    [key: string]: any
+  }
+}
+export interface RedisSetmanyRes {
+  data: {
+    [key: string]: any
+  }
+}
+
+
+/**
+ * get 
+ */
+export interface MysqlGetKey{
+  [key: string]: string | number
+}
+export interface MongodbGetQuery {
+  select?: string | string[]
+}
+export interface MysqlGetQuery {
+  select?: string | string[]
+}
+
+export interface MysqlGetRes {
+  data: {
+    id?: string | number
+    [key: string]: any
+  }
+  [key: string]: any
+}
+export interface MongodbGetRes {
+  data: {
+    _id: any
+    [key: string]: any
+  }
+}
+export interface RedisGetRes {
+  data: {
+    _expire?: number
+    [key: string]: any
+  }
+}
+export interface FastdbGetRes {
+  data: {
+    id?: string | number
+    [key: string]: any
+  }
+  [key: string]: any
+}
+
+
+
+/**
+ * delete
+ */
+export interface MysqlDeleteParams extends MysqlPRList {
+  page?: number
+  limit?: number
+}
+export interface MongodbDeleteParams extends MongodbPRList {
+  page?: number
+  limit?: number
+}
+
+
 //delete
 export interface MysqlDeleteRes {
   data: {
@@ -481,6 +506,10 @@ export interface FastdbDeleteRes {
 }
 
 
+
+/**
+ * transiction
+ */
 // transiction
 export interface MysqlTransactionRes {
   begin: (callback: Function) => void
@@ -493,6 +522,10 @@ export interface MysqlTransactionRes {
   }
 }
 
-
-//trigger
-// export type TMysqlTrigger = 'set' | 'update' | 'del'
+export interface RedisTransactionRes {
+  begin: (callback: Function) => void
+  // run: (fun: Function) => Promise<RedisGetRes | RedisSetRes | RedisFindRes | RedisDeleteRes | RedisUpdateRes>
+  discard: () => Promise<boolean>
+  commit: () => Promise<any>
+  watch: (table: TTable, id: string | number) => Promise<boolean>
+}

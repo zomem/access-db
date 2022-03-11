@@ -6,7 +6,38 @@ const PARAMS = require('./data/redismany.json')
 
 jest.setTimeout(50000)
 test('redis: ', async () => {
+
+
+  await redis.subscribe(['cc'], (channel, message) => {
+    console.log('channel:sub::', channel, message)
+  })
+  
+
+  setTimeout(async () => {
+    await redis.publish('cc', 'this is a message. 一条')
+  }, 5000);
   return
+
+  const {begin, commit, watch, discard} = await redis.transaction()
+
+  const id = '1646978880916623577462067916'
+  let r2 = await redis.get('a', id)
+  console.log('rrrrrrrr9922222rr', r2)
+  await watch('a', id)
+  await begin(async () => {
+    console.log('bbbbbbe')
+    //await redis.set('a', {name: 'wzj'})
+
+    await redis.get('a', id)
+    await redis.update('a', id, {age: ['incr', 3]})
+    if(id){
+      return await discard()
+    }
+    setTimeout(async () => {
+      let rrr = await commit()
+    }, 5000);
+  })
+
   /** redis.set */ 
   let id2 = ''
   
