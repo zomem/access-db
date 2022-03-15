@@ -8,17 +8,17 @@
  */ 
 import {mongodbCollection} from '../utils/dbMongodb'
 import {changeSetParams} from '../utils/utils'
-import {TTable, MongodbSetParams, MongodbSetRes} from '../index'
+import {TTable, MongodbSetParams, MongodbSetRes, MongodbSession} from '../index'
 
 
 
-function fetchSet(table: TTable, params: MongodbSetParams): Promise<MongodbSetRes>{
+function fetchSet(table: TTable, params: MongodbSetParams, session?: MongodbSession): Promise<MongodbSetRes>{
   return new Promise(async (resolve, reject)=>{
     const {client, db} = await mongodbCollection()
     if(!client) return
     try{
       await client.connect()
-      let res = await db.collection(table).insertOne(changeSetParams(params))
+      let res = await db.collection(table).insertOne(changeSetParams(params), {session})
       resolve({data: res})
       client.close()
     }catch(err){

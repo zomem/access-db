@@ -8,13 +8,13 @@
  */ 
 import {mongodbCollection, mongodbId} from '../utils/dbMongodb'
 import {isJson, isMongodbObjectId} from '../utils/utils'
-import {MongodbUpdateParams, TTable, MongodbUpdateRes, MongodbUpdateKey} from '../index'
+import {MongodbUpdateParams, TTable, MongodbUpdateRes, MongodbUpdateKey, MongodbSession} from '../index'
 import updateTrans from '../utils/updateTrans'
 import {PLATFORM_NAME} from '../constants/constants'
 
 
 
-function fetchUpdate(table: TTable, uniKey: string | MongodbUpdateKey, params: MongodbUpdateParams): Promise<MongodbUpdateRes>{
+function fetchUpdate(table: TTable, uniKey: string | MongodbUpdateKey, params: MongodbUpdateParams, session?: MongodbSession): Promise<MongodbUpdateRes>{
   return new Promise(async (resolve, reject)=>{
     const {client, db} = await mongodbCollection()
     if(!client) return
@@ -32,7 +32,7 @@ function fetchUpdate(table: TTable, uniKey: string | MongodbUpdateKey, params: M
 
       await client.connect()
       let records = updateTrans<MongodbUpdateParams>(params, {}, PLATFORM_NAME.MONGODB)
-      let res = await db.collection(table).updateOne(tempData, records)
+      let res = await db.collection(table).updateOne(tempData, records, {session})
       resolve({data: res})
       client.close()
     }catch(err){

@@ -8,6 +8,23 @@ jest.setTimeout(50000)
 test('redis: ', async () => {
 
 
+
+
+  return
+
+  /** 队列 */
+  const resQu = await redis.queue('name', 'push', ['222'])
+  const resQu2 = await redis.queue('name', 'pop', 3)
+
+  const resQu3 = await redis.queue('name', 'remove', ['tt', '8'])
+
+  console.log('resQu<<<<>>>>', resQu)
+  console.log('resQu<<<<>>>>222', resQu2)
+  console.log('resQu<<<<>>>>333', resQu3)
+
+
+
+  /** 订阅 */
   await redis.subscribe(['cc'], (channel, message) => {
     console.log('channel:sub::', channel, message)
   })

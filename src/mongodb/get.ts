@@ -8,11 +8,11 @@
  */ 
 import {mongodbCollection, mongodbId} from '../utils/dbMongodb'
 import {isJson, isMongodbObjectId} from '../utils/utils'
-import {MongodbGetRes, TTable, MongodbUpdateKey} from '../index'
+import {MongodbGetRes, TTable, MongodbUpdateKey, MongodbSession} from '../index'
 
 
 
-function fetchGet(table: TTable, uniKey: number | string | MongodbUpdateKey): Promise<MongodbGetRes>{
+function fetchGet(table: TTable, uniKey: number | string | MongodbUpdateKey, session?: MongodbSession): Promise<MongodbGetRes>{
   return new Promise(async (resolve, reject)=>{
     const {client, db} = await mongodbCollection()
     if(!client) return
@@ -25,13 +25,12 @@ function fetchGet(table: TTable, uniKey: number | string | MongodbUpdateKey): Pr
           tempData = uniKey
         }else{
           tempData['_id'] = mongodbId(uniKey)
-          console.log(tempData)
         }
       }
 
       await client.connect()
       
-      let res: any = await db.collection(table).findOne(tempData)
+      let res: any = await db.collection(table).findOne(tempData, {session})
       resolve({data: res || {}})
       client.close()
     }catch(err){

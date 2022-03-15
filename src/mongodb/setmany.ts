@@ -1,11 +1,11 @@
 import {mongodbCollection} from '../utils/dbMongodb'
 import {changeSetManyParams, isArray} from '../utils/utils'
-import {TTable, MongodbSetParams, MongodbSetmanyRes} from '../index'
+import {TTable, MongodbSetParams, MongodbSetmanyRes, MongodbSession} from '../index'
 import {SET_MANY_PARAMS_ARR_ERROR, PARAMS_EMPTY_ARR_ERROR} from '../constants/error'
 
 
 
-function fetchSetmany(table: TTable, params: MongodbSetParams[]): Promise<MongodbSetmanyRes>{
+function fetchSetmany(table: TTable, params: MongodbSetParams[], session?: MongodbSession): Promise<MongodbSetmanyRes>{
   return new Promise(async (resolve, reject)=>{
     const {client, db} = await mongodbCollection()
     if(!client) return
@@ -13,7 +13,7 @@ function fetchSetmany(table: TTable, params: MongodbSetParams[]): Promise<Mongod
     if(params.length === 0) throw new Error(PARAMS_EMPTY_ARR_ERROR)
     try{
       await client.connect()
-      let res = await db.collection(table).insertMany(changeSetManyParams(params), {ordered: true})
+      let res = await db.collection(table).insertMany(changeSetManyParams(params), {ordered: true, session})
       resolve({data: res})
       client.close()
     }catch(err){

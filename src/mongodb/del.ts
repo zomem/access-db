@@ -8,10 +8,10 @@
  */
 import {mongodbCollection, mongodbId} from '../utils/dbMongodb'
 import {isJson, isMongodbObjectId} from '../utils/utils'
-import {TTable, MongodbDeleteRes, MongodbUpdateKey} from '../index'
+import {TTable, MongodbDeleteRes, MongodbUpdateKey, MongodbSession} from '../index'
 
 
-function fetchDel(table: TTable, uniKey: number | string | MongodbUpdateKey): Promise<MongodbDeleteRes>{
+function fetchDel(table: TTable, uniKey: number | string | MongodbUpdateKey, session?: MongodbSession): Promise<MongodbDeleteRes>{
   return new Promise(async (resolve, reject)=>{
     const {client, db} = await mongodbCollection()
     if(!client) return
@@ -27,7 +27,7 @@ function fetchDel(table: TTable, uniKey: number | string | MongodbUpdateKey): Pr
         }
       }
       await client.connect()
-      let res: any = await db.collection(table).deleteOne(tempData)
+      let res: any = await db.collection(table).deleteOne(tempData, {session})
       resolve({data: res})
       client.close()
     }catch(err){

@@ -17,7 +17,7 @@ export const PARAMS_NOT_ARR_ERROR = 'The params should be array.'
 export const PARAMS_EMPTY_ARR_ERROR = 'The params should be array, and not empty.'
 
 //redis 
-
+export const QUEUE_METHOD_ERROR = 'The Redis queue method is not defined.'
 
 //geo
 export const GEO_POLYGON_ERROR = 'Polygon type, the number of points should be at least 3, and the first and last points should be the same. So the length of the passed in parameter is at least 4.'

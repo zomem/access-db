@@ -1,4 +1,4 @@
-
+import {ClientSession} from 'mongodb/mongodb'
 
 import mongodb_temp from './mongodb/index'
 import mysql_temp from './mysql/index'
@@ -527,5 +527,32 @@ export interface RedisTransactionRes {
   // run: (fun: Function) => Promise<RedisGetRes | RedisSetRes | RedisFindRes | RedisDeleteRes | RedisUpdateRes>
   discard: () => Promise<boolean>
   commit: () => Promise<any>
-  watch: (table: TTable, id: string | number) => Promise<boolean>
+  watch: (table: TTable, id: string | number | (string | number)[]) => Promise<boolean>
 }
+
+export interface MongodbTransactionRes {
+  begin: (callback: Function) => void
+  rollback: Function
+}
+
+export interface MongodbSession extends ClientSession {}
+
+
+
+
+
+
+
+
+/** redis 队列 */
+
+export type RedisQueueMethod = 'push' | 'pop' | 'remove'
+
+export interface RedisQueueRes {
+  data: {
+    queue: any,
+    pop: any,
+    _queue: any,
+  }
+}
+

@@ -14,7 +14,42 @@ const table = {
 
 
 test('mongodb: ', async () => {
+
+
+
   return
+
+  // /** 事务测试 */
+
+  // const {begin, rollback} = await mongodb.transaction()
+
+
+  // await begin(async (session) => {
+  //   console.log('aaaaaaaaaaa')
+  //   try{
+  //     console.log('333333333333333')
+  //     let temp = await mongodb.get('users', '622ea8fc4c87537b7eee81ab', session)
+  //     console.log('tempppp', temp)
+
+  //     let t2 = await mongodb.set('users', {
+  //       title: '和',
+  //       name: '一个用户',
+  //       age: 18
+  //     }, session)
+  //     console.log('t2222', t2)
+  //     let t3 = await mongodb.set('book', {
+  //       title: '忆',
+  //       author: '一个用户',
+  //       price: 32.33
+  //     }, session)
+  //     console.log('t3333', t3)
+      
+  //   }catch(err){
+  //     return await rollback()
+  //   }
+  // })
+
+
   console.time('settime')
   const temp = await mongodb.set(table.users, {
     ...DATA[0],
@@ -58,18 +93,18 @@ test('mongodb: ', async () => {
       title: '323'
     }
   ])
-  // await mongodb.delmany(table.users, ids)
+  await mongodb.delmany(table.users, ids)
 
 
-  // await mongodb.setmany(table.users, DATA)
-  // const list2 = (await mongodb.find(table.users)).data.objects
-  // let ages = []
-  // for(let j = 0; j < list2.length; j++){
-  //   if(list2[j].age < 20){
-  //     ages.push({age: list2[j].age})
-  //   }
-  // }
-  // await mongodb.delmany(table.users, ages)
+  await mongodb.setmany(table.users, DATA)
+  const list2 = (await mongodb.find(table.users)).data.objects
+  let ages = []
+  for(let j = 0; j < list2.length; j++){
+    if(list2[j].age < 30){
+      ages.push({age: list2[j].age})
+    }
+  }
+  await mongodb.delmany(table.users, ages)
 
   console.timeEnd('settime')
 

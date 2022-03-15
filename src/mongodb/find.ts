@@ -1,15 +1,14 @@
 
 import {mongodbCollection} from '../utils/dbMongodb'
 import {PARAM_TABLE_ERROR} from '../constants/error'
-import {TTable, MongodbCheckParams, MongodbFindRes, TSentence} from '../index'
+import {TTable, MongodbCheckParams, MongodbFindRes, MongodbSession} from '../index'
 import findTrans from '../utils/findTrans'
 import {PLATFORM_NAME} from '../constants/constants'
 
 
 
 function fetchFind(table: TTable, params: MongodbCheckParams): Promise<MongodbFindRes>
-function fetchFind(table: TTable, params: MongodbCheckParams, query: TSentence): Promise<any>
-function fetchFind(table: TTable, params: MongodbCheckParams = {}, query?: TSentence): Promise<MongodbFindRes | any>{
+function fetchFind(table: TTable, params: MongodbCheckParams = {}, session?: MongodbSession): Promise<MongodbFindRes>{
   return new Promise(async (resolve, reject)=>{
     const {client, db} = await mongodbCollection()
     if(!client) return
@@ -27,12 +26,9 @@ function fetchFind(table: TTable, params: MongodbCheckParams = {}, query?: TSent
           }
         }
       }
-      if(query === 'sentence'){
-        return resolve(QQ)
-      }
 
       await client.connect()
-      let res = await db.collection(table).find(QQ === 2 ? {} : QQ)
+      let res = await db.collection(table).find(QQ === 2 ? {} : QQ, {session})
                 .limit(params.limit || 20)
                 .skip((params.limit || 20) * ((params.page || 1) - 1))
                 .sort(sortObj).toArray()

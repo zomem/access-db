@@ -1,12 +1,12 @@
 
 import {mongodbCollection, mongodbId} from '../utils/dbMongodb'
 import {isJson, isMongodbObjectId, isArray} from '../utils/utils'
-import {TTable, MongodbDeleteRes, MongodbUpdateKey} from '../index'
+import {TTable, MongodbDeleteRes, MongodbUpdateKey, MongodbSession} from '../index'
 import {PARAMS_EMPTY_ARR_ERROR, PARAMS_NOT_ARR_ERROR} from '../constants/error'
 
 
 
-function fetchDelmany(table: TTable, uniKeys: number[] | string[] | MongodbUpdateKey[]): Promise<MongodbDeleteRes>{
+function fetchDelmany(table: TTable, uniKeys: number[] | string[] | MongodbUpdateKey[], session?: MongodbSession): Promise<MongodbDeleteRes>{
   return new Promise(async (resolve, reject)=>{
     const {client, db} = await mongodbCollection()
     if(!client) return
@@ -36,7 +36,7 @@ function fetchDelmany(table: TTable, uniKeys: number[] | string[] | MongodbUpdat
         
       }
       await client.connect()
-      let res: any = await db.collection(table).deleteMany({[tempID]: {'$in': tempData}})
+      let res: any = await db.collection(table).deleteMany({[tempID]: {'$in': tempData}}, {session})
       resolve({data: res})
       client.close()
     }catch(err){

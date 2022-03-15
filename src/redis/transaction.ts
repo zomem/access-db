@@ -1,6 +1,7 @@
 
 import {redisClient, reTable} from '../utils/dbRedis'
 import {RedisTransactionRes, TTable} from '../index'
+import { isArray } from '../utils/utils'
 
 
 function fetchTransaction(): Promise<RedisTransactionRes>{
@@ -15,7 +16,7 @@ function fetchTransaction(): Promise<RedisTransactionRes>{
           resolve(true)
         })
       }
-            
+      
       // 触发事务
       let commit = (): Promise<any> => {
         return new Promise(async (resolve, reject) => {
@@ -33,10 +34,18 @@ function fetchTransaction(): Promise<RedisTransactionRes>{
       }
 
       //check-and-set实现乐观锁 
-      let watch = (table: TTable, id: number | string): Promise<boolean> => {
+      let watch = (table: TTable, id: number | string | (number | string)[]): Promise<boolean> => {
         return new Promise(async (resolve, reject) => {
-          let hkey: string = reTable(table) + ':' + id
-          await redisClient.sendCommand(['WATCH', hkey])
+          let hkey: string[] = []
+          if(isArray(id)){
+            let tempIds = id as (number | string)[]
+            for(let i = 0; i < tempIds.length; i++){
+              hkey.push(reTable(table) + ':' + tempIds[i])
+            }
+          }else{
+            hkey = [reTable(table) + ':' + id]
+          }
+          await redisClient.sendCommand(['WATCH', ...hkey])
           resolve(true)
         })
       }
