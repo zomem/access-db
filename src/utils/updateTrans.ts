@@ -4,7 +4,8 @@ import {
   MONGODB_UPDATE_METHORD,
   MYSQL_UPDATE_METHORD, 
   REDIS_UPDATE_METHORD,
-  FASTDB_UPDATE_METHORD
+  FASTDB_UPDATE_METHORD,
+  ELASTICSEARCH_UPDATE_METHORD
 } from '../constants/constants'
 import {UPDATE_ERROR, FASTDB_UPDATE_JSON_ERROR} from '../constants/error'
 import {cloneDeep, isArray, isJson, changeSqlParam} from './utils'
@@ -303,6 +304,123 @@ export default function updateTrans<T>(params: T, query, dbType){
       oldJson = changeJson(oldJson, pa, params[pa])
     }
     result = oldJson
+  }
+
+
+  // elasticsearch
+  if(dbType === PLATFORM_NAME.ELASTICSEARCH){
+    let operate = {source: '', params: {}}
+    for(let pa in params){
+      let temp: any = {}, tempSource: string = ''
+      if(!isArray(params[pa])){
+        //不是数组，则直接 set
+        tempSource = `ctx._source.${pa} = params.${pa};`
+        temp[pa] = params[pa]
+        operate.source += tempSource
+        operate.params = {...operate.params, ...temp}
+        continue
+      }
+      if(ELASTICSEARCH_UPDATE_METHORD.indexOf(params[pa][0]) > -1){
+        switch(params[pa][0]){
+          case 'set':
+            tempSource = `ctx._source.${pa} = params.${pa};`
+            temp[pa] = params[pa][1]
+            operate.source += tempSource
+            operate.params = {...operate.params, ...temp}
+            break
+          case 'geo':
+            let temp2: any = params[pa], tempGeo = {}
+            temp2.shift()
+            if(temp2.length > 1){
+              tempGeo = cloneDeep({
+                type: 'Polygon',
+                coordinates: [temp2]
+              })
+            }else{
+              tempGeo = cloneDeep({
+                type: 'Point',
+                coordinates: temp2[0]
+              })
+            }
+            tempSource = `ctx._source.${pa} = params.${pa};`
+            temp[pa] = tempGeo
+            operate.source += tempSource
+            operate.params = {...operate.params, ...temp}
+            break
+          case 'unset':
+            tempSource = `ctx._source.${pa} = params.${pa};`
+            temp[pa] = null
+            operate.source += tempSource
+            operate.params = {...operate.params, ...temp}
+            break
+          case 'incr':
+            tempSource = `ctx._source.${pa} += params.${pa};`
+            temp[pa] = params[pa][1]
+            operate.source += tempSource
+            operate.params = {...operate.params, ...temp}
+            break
+          case 'append':
+            temp[pa] = params[pa][1]
+            if(isArray(temp[pa])){
+              tempSource = `
+                for(int i = 0; i < params.${pa}.length; i++){
+                  ctx._source.${pa}.add(params.${pa}[i]);
+                }
+              `
+            }else{
+              tempSource = `ctx._source.${pa}.add(params.${pa});`
+            }
+            operate.source += tempSource
+            operate.params = {...operate.params, ...temp}
+            break
+          case 'uAppend':
+            temp[pa] = params[pa][1]
+            if(isArray(temp[pa])){
+              tempSource = `
+                for(int i = 0; i < params.${pa}.length; i++){
+                  if (!ctx._source.${pa}.contains(params.${pa}[i])) { ctx._source.${pa}.add(params.${pa}[i]);}
+                }
+              `
+            }else{
+              tempSource = `if (!ctx._source.${pa}.contains(params.${pa})) { ctx._source.${pa}.add(params.${pa});}`
+            }
+            operate.source += tempSource
+            operate.params = {...operate.params, ...temp}
+            break
+          case 'remove':
+            temp[pa] = params[pa][1]
+            if(isArray(temp[pa])){
+              tempSource = `
+                for (int i = ctx._source.${pa}.length - 1; i >= 0; i--) {
+                  if (params.${pa}.contains(ctx._source.${pa}[i])) {
+                    ctx._source.${pa}.remove(i)
+                  }
+                }
+              `
+            }else{
+              tempSource = `
+                for (int i = ctx._source.${pa}.length - 1; i >= 0; i--) {
+                  if (params.${pa} == ctx._source.${pa}[i]) {
+                    ctx._source.${pa}.remove(i)
+                  }
+                }
+              `
+            }
+            operate.source += tempSource
+            operate.params = {...operate.params, ...temp}
+            break
+          default:
+            throw new Error(UPDATE_ERROR)
+        }
+      }else{
+        //直接 set
+        tempSource = `ctx._source.${pa} = params.${pa};`
+        temp[pa] = params[pa]
+        operate.source += tempSource
+        operate.params = {...operate.params, ...temp}
+      }
+    }
+    result = operate
   }
 
   return result

@@ -651,6 +651,54 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
       }
     }
   }
+  // elasticsearch
+  if(dbType === PLATFORM_NAME.ELASTICSEARCH){
+    for(let i = 0; i < ps.length; i++){
+      query[ps[i]] = {}
+      if(!params[ps[i]]) throw new Error(FIND_NO_PJ_ERROR + ps[i])
+      switch(params[ps[i]][1]){
+        case '=':
+          query[ps[i]]['term'] = {}
+          query[ps[i]]['term'][params[ps[i]][0]] ={value: params[ps[i]][2]}
+          break
+        // case '!=':  // 此方法有问题，暂不启用
+        //   query[ps[i]]['bool'] = {must_not: [{term: {}}]}
+        //   query[ps[i]]['bool']['must_not'][0]['term'][params[ps[i]][0]] = {value: params[ps[i]][2]}
+        //   break
+        case '<':
+          query[ps[i]]['range'] = {}
+          query[ps[i]]['range'][params[ps[i]][0]] = {lt: params[ps[i]][2]}
+          break
+        case '<=':
+          query[ps[i]]['range'] = {}
+          query[ps[i]]['range'][params[ps[i]][0]] = {lte: params[ps[i]][2]}
+          break
+        case '>':
+          query[ps[i]]['range'] = {}
+          query[ps[i]]['range'][params[ps[i]][0]] = {gt: params[ps[i]][2]}
+          break
+        case '>=':
+          query[ps[i]]['range'] = {}
+          query[ps[i]]['range'][params[ps[i]][0]] = {gte: params[ps[i]][2]}
+          break
+        case 'match':
+          query[ps[i]]['match'] = {}
+          query[ps[i]]['match'][params[ps[i]][0]] = params[ps[i]][2]
+          break
+        case 'isExists':
+          if(params[ps[i]][2]){
+            query[ps[i]]['exists'] = {}
+            query[ps[i]]['exists'] = {field: params[ps[i]][0]}
+          }else{
+            query[ps[i]]['missing'] = {}
+            query[ps[i]]['missing'] = {field: params[ps[i]][0]}
+          }
+          break
+        default:
+          throw new Error(FIND_P_ERROR)
+      }
+    }
+  }
 
 
   for(let i = 0; i < list.length; i++){
@@ -738,6 +786,19 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
         }
       }
 
+      //elasticsearch
+      if(dbType === PLATFORM_NAME.ELASTICSEARCH){
+        while(n < tempArr.length - 1){
+          if(tempArr[n+1] === '&&'){
+            tempQQ = {bool: {must: [tempQQ, query[tempArr[n+2]]]}}
+          }
+          if(tempArr[n+1] === '||'){
+            tempQQ = {bool: {should: [tempQQ, query[tempArr[n+2]]]}}
+          }
+          n += 2
+        }
+      }
+
       query[`pp${i}`] = tempQQ
       topBrackets = `pp${i}`
       stack.push(topBrackets)
@@ -819,6 +880,19 @@ export default function findTrans<T>(params: T, r_num: number, query_data, dbTyp
         }else{
           QQ = false
         }
+      }
+      n += 2
+    }
+  }
+
+  //elasticsearch
+  if(dbType === PLATFORM_NAME.ELASTICSEARCH){
+    while(n < tempArr2.length - 1){
+      if(tempArr2[n+1] === '&&'){
+        QQ = {bool: {must: [QQ, query[tempArr2[n+2]]]}}
+      }
+      if(tempArr2[n+1] === '||'){
+        QQ = {bool: {should: [QQ, query[tempArr2[n+2]]]}}
       }
       n += 2
     }

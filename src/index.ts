@@ -1,25 +1,24 @@
+import 'dotenv/config'
 import {ClientSession} from 'mongodb/mongodb'
 
-import mongodb_temp from './mongodb/index'
-import mysql_temp from './mysql/index'
-import redis_temp from './redis/index'
-import fastdb_temp from './fastdb'
-import promiselimit_temp from './common/promiselimit'
+import mongodb from './mongodb'
+import mysql from './mysql'
+import mssql from './mssql'
+import redis from './redis'
+import fastdb from './fastdb'
+import elasticsearch from './elasticsearch'
+import promiselimit from './common/promiselimit'
 
 
 
-export const mongodb = mongodb_temp
-export const mysql = mysql_temp
-export const redis = redis_temp
-export const fastdb = fastdb_temp
-export const promiselimit = promiselimit_temp
-
-export default {
-  mongodb: mongodb_temp,
-  mysql: mysql_temp,
-  redis: redis_temp,
-  fastdb: fastdb_temp,
-  promiselimit: promiselimit_temp
+export {
+  mongodb,
+  mysql,
+  mssql,
+  redis,
+  fastdb,
+  elasticsearch,
+  promiselimit
 }
 
 
@@ -43,6 +42,9 @@ export type TTable = string
 export type TMongodbCheckMethod = '=' | '!=' | '<' | '<=' | '>' | '>=' |
 'in' | 'notIn' | 'arrContain' | 'regex' | 'strLength' | 'isExists' | 
 'geoInclude' | 'geoWithinCircle' | 'geoWithinRegion' | 'geoWithin'
+
+export type TElasticsearchCheckMethod = '=' | '<' | '<=' | '>' | '>=' | 'match' | 
+'isExists'
 
 type TMongodbBSONTypes = 'double' | 'string' | 'object' | 'array' | 'binData' | 
 'objectId' | 'bool' | 'date' | 'null' | 'regex' | 'javascript' | 'int' | 
@@ -111,28 +113,28 @@ interface MysqlPRList {
 
 
 interface MongodbPRList {
-  p0?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes | TMongodbBSONTypes[]]
+  p0?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
   p1?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
   p2?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
-  p3?: [string, TMongodbCheckMethod, ...any[]]
-  p4?: [string, TMongodbCheckMethod, ...any[]]
-  p5?: [string, TMongodbCheckMethod, ...any[]]
-  p6?: [string, TMongodbCheckMethod, ...any[]]
-  p7?: [string, TMongodbCheckMethod, ...any[]]
-  p8?: [string, TMongodbCheckMethod, ...any[]]
-  p9?: [string, TMongodbCheckMethod, ...any[]]
-  p10?: [string, TMongodbCheckMethod, ...any[]]
-  p11?: [string, TMongodbCheckMethod, ...any[]]
-  p12?: [string, TMongodbCheckMethod, ...any[]]
-  p13?: [string, TMongodbCheckMethod, ...any[]]
-  p14?: [string, TMongodbCheckMethod, ...any[]]
-  p15?: [string, TMongodbCheckMethod, ...any[]]
-  p16?: [string, TMongodbCheckMethod, ...any[]]
-  p17?: [string, TMongodbCheckMethod, ...any[]]
-  p18?: [string, TMongodbCheckMethod, ...any[]]
-  p19?: [string, TMongodbCheckMethod, ...any[]]
+  p3?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p4?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p5?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p6?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p7?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p8?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p9?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p10?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p11?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p12?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p13?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p14?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p15?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p16?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p17?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p18?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
+  p19?: [string, TMongodbCheckMethod, ...any[]] | [string, 'type', TMongodbBSONTypes]
   r?: string
-  r2?: string
+  // r2?: string
 }
 
 interface FastdbPRList {
@@ -183,12 +185,36 @@ interface RedisPRList {
   r?: string
 }
 
+interface ElasticsearchPRList{
+  p0?: [string, TElasticsearchCheckMethod, ...any[]]
+  p1?: [string, TElasticsearchCheckMethod, ...any[]]
+  p2?: [string, TElasticsearchCheckMethod, ...any[]]
+  p3?: [string, TElasticsearchCheckMethod, ...any[]]
+  p4?: [string, TElasticsearchCheckMethod, ...any[]]
+  p5?: [string, TElasticsearchCheckMethod, ...any[]]
+  p6?: [string, TElasticsearchCheckMethod, ...any[]]
+  p7?: [string, TElasticsearchCheckMethod, ...any[]]
+  p8?: [string, TElasticsearchCheckMethod, ...any[]]
+  p9?: [string, TElasticsearchCheckMethod, ...any[]]
+  p10?: [string, TElasticsearchCheckMethod, ...any[]]
+  p11?: [string, TElasticsearchCheckMethod, ...any[]]
+  p12?: [string, TElasticsearchCheckMethod, ...any[]]
+  p13?: [string, TElasticsearchCheckMethod, ...any[]]
+  p14?: [string, TElasticsearchCheckMethod, ...any[]]
+  p15?: [string, TElasticsearchCheckMethod, ...any[]]
+  p16?: [string, TElasticsearchCheckMethod, ...any[]]
+  p17?: [string, TElasticsearchCheckMethod, ...any[]]
+  p18?: [string, TElasticsearchCheckMethod, ...any[]]
+  p19?: [string, TElasticsearchCheckMethod, ...any[]]
+  r?: string
+}
+
 export interface MongodbCheckParams extends MongodbPRList {
   page?: number
   limit?: number
   orderBy?: string[]
   select?: string[]
-  groupBy?: string[]
+  // groupBy?: string[]
 }
 export interface MysqlCheckParams extends MysqlPRList {
   page?: number
@@ -208,8 +234,15 @@ export interface FastdbCheckParams extends FastdbPRList {
   orderBy?: string[]
   // select?: string[]
 }
+export interface ElasticsearchCheckParams extends ElasticsearchPRList {
+  page?: number
+  limit?: number
+  orderBy?: string[]
+  select?: string[]
+  // groupBy?: string[]
+}
 
-//find方法的返回
+// find 方法的返回
 export interface MongodbFindRes {
   data: {
     objects: any[]
@@ -238,24 +271,25 @@ export interface FastdbFindRes {
   }
   [key: string]: any
 }
-
+export interface ElasticsearchFindRes {
+  data: {
+    objects: any[]
+    took: number
+    max_score?: number
+    total?: number
+  }
+  [key: string]: any
+}
 
 /**
  * count
  */
 
-export interface MysqlCountParams extends MysqlPRList {
-  
-}
-export interface MongodbCountParams extends MongodbPRList {
-  limit?: 1
-}
-export interface FastdbCountParams extends FastdbPRList {
-  
-}
-export interface RedisCountParams extends RedisPRList {
-  
-}
+export interface MysqlCountParams extends MysqlPRList {}
+export interface MongodbCountParams extends MongodbPRList {}
+export interface FastdbCountParams extends FastdbPRList {}
+export interface RedisCountParams extends RedisPRList {}
+export interface ElasticsearchCountParams extends ElasticsearchPRList{}
 export interface CountRes {
   data: number
 }
@@ -306,6 +340,9 @@ export interface RedisUpdateParams {
 export interface FastdbUpdateParams {
   [key: string]: [TFastdbUpdateMethod, dataType] | dataType
 }
+export interface ElasticsearchUpdateParams{
+  [key: string]: [TMongodbUpdateMethod, dataType] | dataType
+}
 
 
 export interface MysqlUpdateRes {
@@ -350,7 +387,17 @@ export interface FastdbUpdateRes {
     [key: string]: any
   }
 }
-
+export interface ElasticsearchUpdateRes {
+  data: {
+    _id: string
+    _index: string
+    _version: number
+    result: string
+    _seq_no: number
+    _primary_term: number
+    [key: string]: any
+  }
+}
 
 
 
@@ -440,6 +487,7 @@ export interface MysqlGetQuery {
   select?: string | string[]
 }
 
+
 export interface MysqlGetRes {
   data: {
     id?: string | number
@@ -450,6 +498,17 @@ export interface MysqlGetRes {
 export interface MongodbGetRes {
   data: {
     _id: any
+    [key: string]: any
+  }
+}
+export interface ElasticsearchGetRes {
+  data: {
+    _index: string
+    _id: string
+    _version?: number
+    _seq_no?: number
+    _primary_term?: number
+    found?: boolean
     [key: string]: any
   }
 }
@@ -527,7 +586,7 @@ export interface RedisTransactionRes {
   // run: (fun: Function) => Promise<RedisGetRes | RedisSetRes | RedisFindRes | RedisDeleteRes | RedisUpdateRes>
   discard: () => Promise<boolean>
   commit: () => Promise<any>
-  watch: (table: TTable, id: string | number | (string | number)[]) => Promise<boolean>
+  watch: (table: TTable, id?: string | number | (string | number)[]) => Promise<boolean>
 }
 
 export interface MongodbTransactionRes {
@@ -546,7 +605,7 @@ export interface MongodbSession extends ClientSession {}
 
 /** redis 队列 */
 
-export type RedisQueueMethod = 'push' | 'pop' | 'remove'
+export type RedisQueueMethod = 'push' | 'pop' | 'remove' | 'get'
 
 export interface RedisQueueRes {
   data: {

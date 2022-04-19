@@ -1,4 +1,3 @@
-require('dotenv').config()
 const {fastdb} = require('../lib/index')
 
 // jest.setTimeout(500000)

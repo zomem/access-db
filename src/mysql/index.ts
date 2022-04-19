@@ -1,25 +1,25 @@
 
-import count_temp from './count'
-import del_temp from './del'
-import delmany_temp from './delmany'
-import find_temp from './find'
-import get_temp from './get'
-import set_temp from './set'
-import setmany_temp from './setmany'
-import transaction_temp from './transaction'
-import update_temp from './update'
-import updatemany_temp from './updatemany'
+import count from './count'
+import del from './del'
+import delmany from './delmany'
+import find from './find'
+import get from './get'
+import set from './set'
+import setmany from './setmany'
+import transaction from './transaction'
+import update from './update'
+import updatemany from './updatemany'
 
 
 export default {
-  count: count_temp,
-  del: del_temp,
-  delmany: delmany_temp,
-  find: find_temp,
-  get: get_temp,
-  set: set_temp,
-  setmany: setmany_temp,
-  transaction: transaction_temp,
-  update: update_temp,
-  updatemany: updatemany_temp,
+  count,
+  del,
+  delmany,
+  find,
+  get,
+  set,
+  setmany,
+  transaction,
+  update,
+  updatemany,
 }

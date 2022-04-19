@@ -34,16 +34,20 @@ function fetchTransaction(): Promise<RedisTransactionRes>{
       }
 
       //check-and-set实现乐观锁 
-      let watch = (table: TTable, id: number | string | (number | string)[]): Promise<boolean> => {
+      let watch = (table: TTable, id?: number | string | (number | string)[]): Promise<boolean> => {
         return new Promise(async (resolve, reject) => {
           let hkey: string[] = []
-          if(isArray(id)){
-            let tempIds = id as (number | string)[]
-            for(let i = 0; i < tempIds.length; i++){
-              hkey.push(reTable(table) + ':' + tempIds[i])
+          if(id){
+            if(isArray(id)){
+              let tempIds = id as (number | string)[]
+              for(let i = 0; i < tempIds.length; i++){
+                hkey.push(reTable(table) + ':' + tempIds[i])
+              }
+            }else{
+              hkey = [reTable(table) + ':' + id]
             }
           }else{
-            hkey = [reTable(table) + ':' + id]
+            hkey = [reTable(table)]
           }
           await redisClient.sendCommand(['WATCH', ...hkey])
           resolve(true)

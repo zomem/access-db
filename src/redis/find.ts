@@ -1,8 +1,9 @@
 import {redisClient, reTable} from '../utils/dbRedis'
 import {RedisFindRes, TTable, RedisCheckParams} from '../index'
-import {stringTimeNumSort, RedisSortNum, RedisSortStr} from '../utils/utils'
+import {stringTimeNumSort, RedisSortNum, RedisSortStr, isArray} from '../utils/utils'
 import findTrans from '../utils/findTrans'
 import { PLATFORM_NAME } from '../constants/constants'
+import { ORDER_BY_NOT_ARRAY } from '../constants/error'
 
 function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisFindRes>{
   return new Promise(async (resolve, reject)=>{
@@ -54,7 +55,8 @@ function fetchFind(table: TTable, params: RedisCheckParams = {}): Promise<RedisF
         newarr = (await Promise.all(func)) as any
 
         if(newarr.length > 0 && params.orderBy){
-          let tempOrder = params.orderBy[0].substr(1)
+          if(!isArray(params.orderBy)) throw new Error(ORDER_BY_NOT_ARRAY)
+          let tempOrder = params.orderBy[0].substring(1)
           let isNum = +newarr[0][tempOrder] === NaN ? false : true
           if(params.orderBy[0][0] === '-'){
             newarr = isNum ? RedisSortNum(newarr, tempOrder, 0) : RedisSortStr(newarr, tempOrder, 0)

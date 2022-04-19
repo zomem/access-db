@@ -1,9 +1,9 @@
 import {pathTo} from '../utils/pathTo'
 import {FastdbCheckParams, FastdbFindRes} from '../index'
 import { PLATFORM_NAME } from '../constants/constants'
-import {FASTDB_FILE_ERROR} from '../constants/error'
+import {FASTDB_FILE_ERROR, ORDER_BY_NOT_ARRAY} from '../constants/error'
 import findTrans from '../utils/findTrans'
-import {fastdbSort} from '../utils/utils'
+import {fastdbSort, isArray} from '../utils/utils'
 
 const fs = require('fs')
 const POSITION_STEP = 9
@@ -24,6 +24,7 @@ function fetchFind(table: string, params: FastdbCheckParams = {}): FastdbFindRes
   
   
   if(params.orderBy){
+    if(!isArray(params.orderBy)) throw new Error(ORDER_BY_NOT_ARRAY)
     let all_json = JSON.parse(oldBuf.toString())
     if(params.orderBy[0][0] === '-'){
       newarr = fastdbSort(all_json, params.orderBy[0].substr(1), 0)

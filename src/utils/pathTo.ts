@@ -3,14 +3,9 @@ const fs = require('fs')
 const path = require('path')
 
 export const pathTo = (fileName: string): string => {
-  const dir = process.env.FASTDB_DIR
-  if(dir){
-    return path.join(__dirname, `../../../../${dir}/` + fileName + '.json')
-    // return path.join(__dirname, `../../${dir}/fastdb/` + fileName + '.json')
-  }else{
-    return path.join(__dirname, `../../../../fastdb/` + fileName + '.json')
-    // return path.join(__dirname, '../../fastdb/' + fileName + '.json')
-  }
+  let dir = process.env.FASTDB_DIR || 'fastdb'
+  let fpath = process.env.FASTDB_PATH || `../../../../`
+  return path.join(__dirname, fpath + `${dir}/` + fileName + '.json')
 }
 
 

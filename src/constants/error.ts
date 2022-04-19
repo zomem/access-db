@@ -49,3 +49,9 @@ export const FASTDB_UPDATE_JSON_ERROR = 'The parmas name use too many point.'
 
 // mongodb
 export const ID_EMPTY_ERROR = 'The update/updatemany method, key(exp: _id) could not be empty'
+
+
+// select should be array
+export const SELECT_NOT_ARRAY = 'The find params.select must be array.'
+// orderBy should be array
+export const ORDER_BY_NOT_ARRAY = 'The find params.orderBy must be array.'

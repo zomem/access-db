@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 
 const {mongodb} = require('../lib/index')
 const DATA = require('./data/mongodb.json')
@@ -14,8 +12,6 @@ const table = {
 
 
 test('mongodb: ', async () => {
-
-
 
   return
 

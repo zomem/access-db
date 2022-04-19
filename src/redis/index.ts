@@ -1,27 +1,27 @@
-import count_temp from './count'
-import del_temp from './del'
-import delmany_temp from './delmany'
-import find_temp from './find'
-import get_temp from './get'
-import publish_temp from './publish'
-import queue_temp from './queue'
-import set_temp from './set'
-import setmany_temp from './setmany'
-import subscribe_temp from './subscribe'
-import transaction_temp from './transaction'
-import update_temp from './update'
+import count from './count'
+import del from './del'
+import delmany from './delmany'
+import find from './find'
+import get from './get'
+import publish from './publish'
+import queue from './queue'
+import set from './set'
+import setmany from './setmany'
+import subscribe from './subscribe'
+import transaction from './transaction'
+import update from './update'
 
 export default {
-  count: count_temp,
-  del: del_temp,
-  delmany: delmany_temp,
-  find: find_temp,
-  get: get_temp,
-  publish: publish_temp,
-  queue: queue_temp,
-  set: set_temp,
-  setmany: setmany_temp,
-  subscribe: subscribe_temp,
-  transaction: transaction_temp,
-  update: update_temp,
+  count,
+  del,
+  delmany,
+  find,
+  get,
+  publish,
+  queue,
+  set,
+  setmany,
+  subscribe,
+  transaction,
+  update,
 }

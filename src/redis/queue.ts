@@ -3,21 +3,32 @@ import {TTable, RedisQueueRes, RedisQueueMethod} from '../index'
 import { isArray } from '../utils/utils'
 
 
-function fetchQueue(queueName: TTable, method: 'remove', params: string[]): Promise<RedisQueueRes>
+function fetchQueue(queueName: TTable, method: 'get'): Promise<RedisQueueRes>
+function fetchQueue(queueName: TTable, method: 'remove', params: string[], unique?: boolean): Promise<RedisQueueRes>
 function fetchQueue(queueName: TTable, method: 'pop', params: number): Promise<RedisQueueRes>
-function fetchQueue(queueName: TTable, method: 'push', params: string | string[]): Promise<RedisQueueRes>
-function fetchQueue(queueName: TTable, method: RedisQueueMethod, params): Promise<RedisQueueRes>{
+function fetchQueue(queueName: TTable, method: 'push', params: string | string[], unique?: boolean): Promise<RedisQueueRes>
+function fetchQueue(queueName: TTable, method: RedisQueueMethod, params?: number | string | string[], unique?: boolean): Promise<RedisQueueRes>{
   return new Promise(async (resolve, reject)=>{
     try{
       const queue = reTable(queueName)
       const _queue = reTable(queueName + '_queue_backups')
 
-      let func: any = []
+      let func: any = [], tempParams: string[] = []
+
+      if(isArray(params)){
+        tempParams = params as string[]
+      }else if(typeof(params) === 'string'){
+        tempParams = [params]
+      }
       switch(method) {
         case 'push':
-          if(!params) break
-          if(params.length === 0) break
-          func.push(redisClient.LPUSH(queue, isArray(params) ? params.reverse() : params))
+          if(tempParams.length === 0) break
+          if(unique){
+            for(let j = 0; j < tempParams.length; j++){
+              func.push(redisClient.LREM(queue, 0, tempParams[j]))
+            }
+          }
+          func.push(redisClient.LPUSH(queue, tempParams.reverse()))
           break
         case 'pop':
           for(let i = 0; i < params; i++){
@@ -25,14 +36,12 @@ function fetchQueue(queueName: TTable, method: RedisQueueMethod, params): Promis
           }
           break
         case 'remove':
-          if(!params) break
-          if(params.length === 0) break
-          if(!isArray(params)){
-            params = [params]
+          if(tempParams.length === 0) break
+          for(let j = 0; j < tempParams.length; j++){
+            func.push(redisClient.LREM(_queue, unique ? 0 : 1, tempParams[j]))
           }
-          for(let j = 0; j < params.length; j++){
-            func.push(redisClient.LREM(_queue, 1, params[j]))
-          }
+          break
+        case 'get':
           break
         default:
           break

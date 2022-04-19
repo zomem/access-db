@@ -1,4 +1,5 @@
-import {mysqlConnect} from '../utils/dbMysql'
+
+import {runSql} from '../utils/dbMssql'
 import {J_MAX, J_NAME_LIST, PLATFORM_NAME} from '../constants/constants'
 import {PARAM_TABLE_ERROR, FIND_J_JOIN_ERROR, FIND_NO_PJ_ERROR, SELECT_NOT_ARRAY, ORDER_BY_NOT_ARRAY} from '../constants/error'
 import {TTable, MysqlCheckParams, MysqlFindRes, TSentence} from '../index'
@@ -11,7 +12,8 @@ function fetchFind(table: TTable, params: MysqlCheckParams): Promise<MysqlFindRe
 function fetchFind(table: TTable, params: MysqlCheckParams, query: TSentence): Promise<string>
 function fetchFind(table: TTable, params: MysqlCheckParams = {}, query?: TSentence): Promise<MysqlFindRes | string>{
   if(!table) throw new Error(PARAM_TABLE_ERROR)
-  return new Promise((resolve, reject)=>{
+  return new Promise(async (resolve, reject)=>{
+    if(!runSql) return null
     let tableList = table.toString().replace(/\s*/g, '').split(',')
     let tableHash = {}, tableMain = tableList[0]
     let joinList = [], 
@@ -257,9 +259,9 @@ function fetchFind(table: TTable, params: MysqlCheckParams = {}, query?: TSenten
     + (QQ === 2 ? ' ' : `WHERE ${QQ} `)
     + (groupArr.length > 0 ? `GROUP BY ${groupArr.toString()} ` : ' ')
     + (QQ2 === 2 ? ' ' : `HAVING ${QQ2} `)
-    + (orderArr.length > 0 ? `ORDER BY ${orderArr.toString()} ` : ' ')
-    + ((params.limit || params.page) ? `LIMIT ${params.limit || 20} ` : ' ')
-    + ((params.page || params.limit) ? `OFFSET ${(params.limit || 20) * ((params.page || 1) - 1)}` : '')
+    + (orderArr.length > 0 ? `ORDER BY ${orderArr.toString()} ` : (params.page || params.limit) ? 'ORDER BY id ' : ' ')
+    + ((params.page || params.limit) ? `OFFSET ${(params.limit || 20) * ((params.page || 1) - 1)} ROWS ` : ' ')
+    + ((params.limit || params.page) ? `FETCH NEXT ${params.limit || 20} ROWS ONLY` : ' ')
     
     if(jUniqueTable.length > 0){
       //去掉重复命令的，以父查寻命名为准
@@ -293,13 +295,12 @@ function fetchFind(table: TTable, params: MysqlCheckParams = {}, query?: TSenten
     if(query === 'sentence'){
       return resolve(sql)
     }
-    mysqlConnect(sql, [], (err, results, fields) => {
-      if (err) {
-        reject(err)
-      }
-      let jsonStr = JSON.stringify(results || [])
-      resolve({data: {objects: JSON.parse(jsonStr)}})
-    })
+
+    const res = await runSql(sql)
+    resolve({data: {
+      objects: res.recordset || []
+    }})
+
   })
 }
 

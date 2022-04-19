@@ -12,7 +12,7 @@ const fs = require('fs')
 
 // let a = (ran.toString(36) + hrt[0].toString(36) + hrt[1].toString(36) + nowTime.toString(36) + ran2.toString(36))
 
-// let s = (a + a.slice(-sl)).substr(0, 25)
+// let s = (a + a.slice(-sl)).substring(0, 25)
 
 // console.timeEnd('ttt')
 // console.log(hrt)

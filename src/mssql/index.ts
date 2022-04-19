@@ -6,9 +6,8 @@ import find from './find'
 import get from './get'
 import set from './set'
 import setmany from './setmany'
-import transaction from './transaction'
 import update from './update'
-import updatemany from './updatemany'
+// import updatemany from './updatemany'
 
 
 export default {
@@ -19,15 +18,6 @@ export default {
   get,
   set,
   setmany,
-  transaction,
   update,
-  updatemany,
+  // updatemany,
 }
-
-
-
-
-
-
-
-

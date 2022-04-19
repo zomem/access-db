@@ -1,4 +1,3 @@
-require('dotenv').config()
 const {redis} = require('../lib/index')
 const DATA = require('./data/redis.json')
 const PARAMS = require('./data/redismany.json')
@@ -8,15 +7,14 @@ jest.setTimeout(50000)
 test('redis: ', async () => {
 
 
-
-
   return
 
-  /** 队列 */
-  const resQu = await redis.queue('name', 'push', ['222'])
-  const resQu2 = await redis.queue('name', 'pop', 3)
 
-  const resQu3 = await redis.queue('name', 'remove', ['tt', '8'])
+  /** 队列 */
+  const resQu = await redis.queue('name', 'push', ['a', 'f', 'h', 'c'], true)
+  const resQu2 = await redis.queue('name', 'pop', 1)
+
+  const resQu3 = await redis.queue('name', 'remove', ['aaa', '8'], true)
 
   console.log('resQu<<<<>>>>', resQu)
   console.log('resQu<<<<>>>>222', resQu2)
@@ -24,6 +22,7 @@ test('redis: ', async () => {
 
 
 
+  return
   /** 订阅 */
   await redis.subscribe(['cc'], (channel, message) => {
     console.log('channel:sub::', channel, message)
