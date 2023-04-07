@@ -1,7 +1,5 @@
 ### 统一各类数据库的连接    
-[access-db文档](https://access-db.cn)  
-[更新日志](https://access-db.cn/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97)  
-  
+
    
 目前支持的数据库有：  
   
@@ -100,8 +98,5 @@ ELASTICSEARCH_DATABASE=access_db
 3. json里没有**换行**和**空格**符号，当前字段的值是可以包含这些的。
 4. **每条数据最前面**都有唯一标识`"id":"xxx"`（新增(fastdb.set)数据时，会自动生成或调整）  
   
-
-#### 成功案例  
-![纸禾禾](https://file.zomem.com/zhihehe/images/wzj.png)  
 
   
